@@ -1,0 +1,18 @@
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+@theme {
+  --color-brand-primary: #00ffcc;
+  --color-brand-secondary: #0088ff;
+  --color-brand-dark: #0a0a0a;
+}
+
+/* Enable class-based dark mode in Tailwind 4 */
+@variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  html {
+    transition-property: color, background-color;
+    transition-duration: 500ms;
+  }
+}
