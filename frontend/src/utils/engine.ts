@@ -101,3 +101,72 @@ export const processStudentData = (data: StudentData): StudentData => {
 
     return { ...data, semesters: updatedSemesters, cgpa };
 };
+
+export interface ForecastResult {
+    requiredSGPA: number;
+    maxPossibleCGPA: number;
+    isPossible: boolean;
+    remainingCH: number;
+    averageCHPerSem: number;
+    maintenanceSGPA: number;
+}
+
+export const calculateForecast = (
+    data: StudentData,
+    targetCGPA: number,
+    remainingSemesters: number,
+    customRemainingCH: number | null = null
+): ForecastResult => {
+    // 1. Calculate current totals using same logic as main processor
+    const bestAttempts = new Map<string, { qp: number, ch: number }>();
+    data.semesters.forEach(sem => {
+        sem.subjects.forEach(sub => {
+            const cleanGrade = sub.grade.trim().toUpperCase();
+            if (['P', 'W', 'I', 'S', 'U', 'PASS', 'FAIL', 'SATISFACTORY', 'UNSATISFACTORY'].includes(cleanGrade)) {
+                bestAttempts.set(sub.course_code, { qp: 0, ch: 0 });
+                return;
+            }
+            const qp = calculateQualityPoints(sub.grade_points, sub.credit_hours);
+            const existing = bestAttempts.get(sub.course_code);
+            if (!existing || qp > existing.qp) {
+                bestAttempts.set(sub.course_code, { qp, ch: sub.credit_hours });
+            }
+        });
+    });
+
+    let currentTotalQP = 0;
+    let currentTotalCH = 0;
+    bestAttempts.forEach(att => {
+        currentTotalQP += att.qp;
+        currentTotalCH += att.ch;
+    });
+
+    // 2. Average CH speed
+    const numSem = data.semesters.length;
+    const avgCH = numSem > 0 ? Math.round(currentTotalCH / numSem) : 18;
+    const remainingCH = customRemainingCH !== null ? customRemainingCH : remainingSemesters * avgCH;
+
+    // 3. Required SGPA
+    const totalFutureCH = currentTotalCH + remainingCH;
+    const requiredTotalQP = totalFutureCH * targetCGPA;
+    const neededQP = requiredTotalQP - currentTotalQP;
+    const reqSGPA = remainingCH > 0 ? neededQP / remainingCH : 0;
+
+    // 4. Max Possible
+    const maxQP = currentTotalQP + (remainingCH * 4.0);
+    const maxCGPA = totalFutureCH > 0 ? Math.round((maxQP / totalFutureCH) * 100) / 100 : 0;
+
+    // 5. Maintenance
+    const maintTotalQP = totalFutureCH * data.cgpa;
+    const maintNeededQP = maintTotalQP - currentTotalQP;
+    const maintSGPA = remainingCH > 0 ? maintNeededQP / remainingCH : 0;
+
+    return {
+        requiredSGPA: Math.max(0, Math.round(reqSGPA * 100) / 100),
+        maxPossibleCGPA: maxCGPA,
+        isPossible: reqSGPA <= 4.0,
+        remainingCH,
+        averageCHPerSem: avgCH,
+        maintenanceSGPA: Math.max(0, Math.round(maintSGPA * 100) / 100)
+    };
+};

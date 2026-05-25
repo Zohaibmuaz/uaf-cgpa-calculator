@@ -1,8 +1,161 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import * as XLSX from 'xlsx';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import type { StudentData, Semester, Subject } from './utils/engine';
-import { processStudentData } from './utils/engine';
+import { processStudentData, calculateForecast } from './utils/engine';
+
+const AcademicForecastModal = ({ student, darkMode, onClose }: { student: StudentData, darkMode: boolean, onClose: () => void }) => {
+  const [targetCgpa, setTargetCgpa] = useState(student.cgpa + 0.1 > 4.0 ? 4.0 : Math.round((student.cgpa + 0.1) * 10) / 10);
+  const [remainingSemesters, setRemainingSemesters] = useState(1);
+  const [customCH, setCustomCH] = useState<number | null>(null);
+  const [isEditingCH, setIsEditingCH] = useState(false);
+
+  const forecast = useMemo(() => {
+    return calculateForecast(student, targetCgpa, remainingSemesters, customCH);
+  }, [student, targetCgpa, remainingSemesters, customCH]);
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-2xl bg-black/60 animate-in fade-in duration-300 font-sans">
+      <div className={`w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-[3.5rem] p-10 shadow-[0_50px_100px_rgba(0,0,0,0.4)] border transition-all duration-500 relative flex flex-col ${
+        darkMode ? 'bg-[#0a0a0a] border-white/10 text-white shadow-brand-primary/10' : 'bg-white border-gray-100 text-gray-800'
+      }`}>
+        <div className="flex justify-between items-start mb-8 shrink-0">
+          <div>
+            <h4 className={`text-[10px] font-black uppercase tracking-[0.4em] mb-2 ${darkMode ? 'text-brand-primary' : 'text-indigo-600'}`}>Intelligent Advisor</h4>
+            <h3 className="text-3xl font-black tracking-tighter uppercase leading-none">Your Goal Planner</h3>
+          </div>
+          <button onClick={onClose} className="p-3 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all">
+            <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+
+        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-10 leading-relaxed max-w-md">
+          Hello! Let's figure out what you need to achieve your target. Just enter your goal below and tell me how many semesters you have left.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 shrink-0">
+          <div className="space-y-2">
+            <label className={`text-[10px] font-black uppercase tracking-widest ml-2 ${darkMode ? 'text-brand-primary' : 'text-indigo-600'}`}>What is your target CGPA?</label>
+            <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl border-2 transition-all ${
+              darkMode ? 'bg-white/[0.02] border-white/5 focus-within:border-brand-primary' : 'bg-gray-50 border-gray-100 focus-within:border-indigo-600'
+            }`}>
+              <input 
+                type="number" step="0.01" min="0" max="4"
+                value={targetCgpa}
+                onChange={(e) => setTargetCgpa(parseFloat(e.target.value) || 0)}
+                className="w-full bg-transparent font-black text-2xl focus:outline-none"
+              />
+              <span className="text-xs font-black text-gray-400 dark:text-gray-600">GOAL</span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className={`text-[10px] font-black uppercase tracking-widest ml-2 ${darkMode ? 'text-brand-primary' : 'text-indigo-600'}`}>How many semesters left?</label>
+            <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl border-2 transition-all ${
+              darkMode ? 'bg-white/[0.02] border-white/5 focus-within:border-brand-primary' : 'bg-gray-50 border-gray-100 focus-within:border-indigo-600'
+            }`}>
+              <select 
+                value={remainingSemesters}
+                onChange={(e) => setRemainingSemesters(parseInt(e.target.value))}
+                className="w-full bg-transparent font-black text-2xl appearance-none cursor-pointer focus:outline-none"
+              >
+                {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n} className="bg-white dark:bg-brand-dark">{n} Semesters</option>)}
+              </select>
+              <svg className="w-5 h-5 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+            </div>
+          </div>
+        </div>
+
+        <div className={`p-10 rounded-[3rem] mb-10 flex flex-col items-center text-center transition-all duration-700 relative overflow-hidden shrink-0 ${
+          forecast.isPossible 
+            ? (darkMode ? 'bg-brand-primary/10 border border-brand-primary/20 shadow-2xl shadow-brand-primary/5' : 'bg-indigo-50 border border-indigo-100 shadow-xl shadow-indigo-100/50')
+            : (darkMode ? 'bg-red-500/10 border border-red-500/20 shadow-2xl shadow-red-500/5' : 'bg-red-50 border border-red-100 shadow-xl shadow-red-100/50')
+        }`}>
+          {forecast.isPossible && <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-brand-primary to-transparent opacity-50"></div>}
+          
+          <div className="text-[10px] font-black uppercase tracking-[0.3em] mb-6 opacity-60">
+            {forecast.isPossible ? 'Strategic Advice' : 'Mathematical Constraint'}
+          </div>
+          
+          {forecast.isPossible ? (
+            <>
+              <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-4">
+                To reach your dream <span className="text-gray-900 dark:text-white">{targetCgpa.toFixed(2)} CGPA</span>, you must maintain:
+              </p>
+              <div className={`text-7xl font-black italic tracking-tighter mb-4 ${darkMode ? 'text-brand-primary' : 'text-indigo-600'}`}>
+                {forecast.requiredSGPA.toFixed(2)}
+              </div>
+              <p className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+                Average SGPA in next {forecast.remainingCH} Credits
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-[11px] font-bold text-red-500/70 uppercase tracking-widest mb-4 leading-relaxed">
+                Unfortunately, even with a perfect 4.00 in all remaining subjects, your highest possible CGPA will be:
+              </p>
+              <div className="text-7xl font-black italic tracking-tighter mb-4 text-red-500">
+                {forecast.maxPossibleCGPA.toFixed(2)}
+              </div>
+              <p className="text-xs font-black text-red-500/40 uppercase tracking-widest">
+                Goal mathematically out of reach
+              </p>
+            </>
+          )}
+        </div>
+
+        <div className="space-y-6 shrink-0">
+          <div className={`flex justify-between items-center text-[10px] font-black uppercase tracking-widest border-b pb-6 ${
+            darkMode ? 'text-brand-primary border-white/10' : 'text-indigo-600 border-gray-100'
+          }`}>
+            <div className="flex items-center gap-3">
+              <span className="opacity-80">Calculated Credits: </span>
+              {isEditingCH ? (
+                <input 
+                  autoFocus type="number"
+                  className="w-20 bg-white dark:bg-white/5 border-2 border-brand-primary/40 rounded-xl px-3 py-1 text-gray-800 dark:text-white font-black"
+                  value={customCH || forecast.remainingCH}
+                  onChange={(e) => setCustomCH(parseInt(e.target.value) || 0)}
+                  onBlur={() => setIsEditingCH(false)}
+                  onKeyDown={(e) => e.key === 'Enter' && setIsEditingCH(false)}
+                />
+              ) : (
+                <button onClick={() => setIsEditingCH(true)} className="flex items-center gap-2 group hover:scale-105 transition-all">
+                  <span className={`font-black text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>{forecast.remainingCH} Credits Total</span>
+                  <svg className="w-3.5 h-3.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                </button>
+              )}
+            </div>
+            <div className="text-right">
+              <span className="opacity-80">AVG SPEED:</span> <span className={`font-black text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>{forecast.averageCHPerSem} CH/Sem</span>
+            </div>
+          </div>
+          
+          <div className={`flex justify-between items-center p-7 rounded-[2.5rem] border-2 transition-all ${
+            darkMode ? 'bg-brand-primary/5 border-brand-primary/20' : 'bg-indigo-50 border-indigo-100'
+          }`}>
+            <div className="flex flex-col">
+              <div className={`text-[10px] font-black uppercase tracking-[0.3em] ${darkMode ? 'text-brand-primary' : 'text-indigo-600'}`}>🛡️ Safe Zone (Stay Stable)</div>
+              <p className={`text-[9px] font-bold uppercase tracking-widest mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>To maintain your current cgpa you need</p>
+            </div>
+            <div className="flex items-baseline gap-1.5 font-black italic">
+              <span className={`text-3xl ${darkMode ? 'text-white' : 'text-gray-900'}`}>{forecast.maintenanceSGPA.toFixed(2)}</span>
+              <span className={`text-[10px] not-italic uppercase ${darkMode ? 'text-brand-primary' : 'text-indigo-600'}`}>SGPA</span>
+            </div>
+          </div>
+
+          <button 
+            onClick={onClose}
+            className={`w-full py-6 rounded-[2rem] font-black tracking-[0.4em] text-[10px] transition-all shadow-xl active:scale-95 uppercase ${
+              darkMode ? 'bg-brand-primary text-black hover:brightness-110 shadow-brand-primary/20' : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-100'
+            }`}
+          >
+            I UNDERSTAND, GO BACK
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const PerformanceGraph = ({ semesters, darkMode }: { semesters: Semester[], darkMode: boolean }) => {
   const data = useMemo(() => {
@@ -287,7 +440,7 @@ const ExcludeSubjectsPopup = ({
 }) => {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-md bg-black/60 animate-in fade-in duration-300 font-sans">
-      <div className={`w-full max-w-xl rounded-[3rem] p-10 shadow-[0_50px_100px_rgba(0,0,0,0.5)] border transition-all duration-500 ${
+      <div className={`w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-[3rem] p-10 shadow-[0_50px_100px_rgba(0,0,0,0.5)] border transition-all duration-500 relative flex flex-col ${
         darkMode ? 'bg-[#0f0f0f] border-white/10 text-white' : 'bg-white border-gray-100 text-gray-800'
       }`}>
         <div className="flex justify-between items-start mb-8">
@@ -300,14 +453,14 @@ const ExcludeSubjectsPopup = ({
           </button>
         </div>
 
-        <p className="text-gray-500 text-xs font-medium mb-8 uppercase tracking-widest opacity-60">Select course codes to remove from CGPA calculation and re-rank the leaderboard.</p>
+        <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 opacity-60">Select subjects to exclude and re-rank.</p>
         
-        <div className="max-h-[400px] overflow-y-auto pr-4 space-y-2 custom-scrollbar">
+        <div className="max-h-[650px] overflow-y-auto pr-4 space-y-2 custom-scrollbar">
           {subjects.map((sub) => (
             <div 
               key={sub.code}
               onClick={() => onToggle(sub.code)}
-              className={`group flex items-center justify-between p-5 rounded-2xl border cursor-pointer transition-all duration-300 ${
+              className={`group flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${
                 excluded.includes(sub.code)
                 ? (darkMode ? 'bg-red-500/10 border-red-500/30 text-white' : 'bg-red-50 border-red-100')
                 : (darkMode ? 'bg-white/[0.02] border-white/5 hover:border-brand-primary/20 text-gray-200' : 'bg-gray-50/50 border-gray-100 hover:border-indigo-200 text-gray-800')
@@ -522,8 +675,9 @@ const ContactPage = ({ darkMode }: { darkMode: boolean }) => {
 };
 
 export default function App() {
-  const [year, setYear] = useState('2023');
-  const [regId, setRegId] = useState('10160');
+  const regIdRef = useRef<HTMLInputElement>(null);
+  const [year, setYear] = useState('');
+  const [regId, setRegId] = useState('');
   const [endRegId, setEndRegId] = useState('');
   const [student, setStudent] = useState<StudentData | null>(null);
   const [batchResults, setBatchResults] = useState<StudentData[]>([]);
@@ -540,6 +694,7 @@ export default function App() {
   const [customAgList, setCustomAgList] = useState<string[]>([]);
   const [uploadedFilename, setUploadedFilename] = useState<string>('');
   const [sortMode, setSortMode] = useState<'ranked' | 'original'>('ranked');
+  const [showForecastModal, setShowForecastModal] = useState(false);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -958,7 +1113,13 @@ export default function App() {
                     <input 
                       type="text" 
                       value={year} 
-                      onChange={(e) => setYear(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setYear(val);
+                        if (val.length === 4) {
+                          regIdRef.current?.focus();
+                        }
+                      }}
                       className="w-16 text-center font-black text-xl bg-transparent text-gray-800 dark:text-white focus:outline-none placeholder:text-gray-300 shrink-0"
                       placeholder="2023"
                     />
@@ -966,10 +1127,11 @@ export default function App() {
                     <input 
                       type="text" 
                       value={regId} 
+                      ref={regIdRef}
                       onChange={(e) => setRegId(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && fetchResults()}
                       className="w-20 text-center font-black text-xl bg-transparent text-gray-800 dark:text-white focus:outline-none placeholder:text-gray-300 border-b border-transparent focus:border-brand-primary/30 font-sans shrink-0"
-                      placeholder="ID"
+                      placeholder="10160"
                     />
                     {viewMode === 'batch' && (
                       <>
@@ -980,7 +1142,7 @@ export default function App() {
                           onChange={(e) => setEndRegId(e.target.value)}
                           onKeyDown={(e) => e.key === 'Enter' && fetchResults()}
                           className="w-20 text-center font-black text-xl bg-transparent text-gray-800 dark:text-white focus:outline-none placeholder:text-gray-300 border-b border-transparent focus:border-brand-primary/30 shrink-0"
-                          placeholder="ID"
+                          placeholder="10160"
                         />
                       </>
                     )}
@@ -1103,14 +1265,14 @@ export default function App() {
             <div className="overflow-hidden rounded-[3rem] border border-gray-100 dark:border-white/[0.05] bg-white dark:bg-white/[0.01] shadow-2xl shadow-gray-200/20 dark:shadow-none font-sans text-gray-800 dark:text-white">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-gray-50/50 dark:bg-white/[0.02] text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-[0.4em]">
+                  <tr className={`bg-gray-50/50 dark:bg-white/[0.02] text-[10px] font-black uppercase tracking-[0.4em] ${darkMode ? 'text-brand-primary' : 'text-indigo-600'}`}>
                    <th className="px-10 py-6">{sortMode === 'ranked' ? 'Rank' : '#'}</th>
                    <th className="px-10 py-6">Student Details</th>
                    <th className="px-10 py-6 text-center">Courses</th>
                    <th className="px-10 py-6 text-right font-sans tracking-tight">Cumulative GPA</th>
                    <th className="px-10 py-6"></th>
                   </tr>
-                  </thead>
+                </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-white/5 text-gray-800 dark:text-white font-sans">
                   {rankedStudents.map((s, index) => (
                    <tr key={s.ag_number} className="group hover:bg-brand-primary/[0.02] transition-all">
@@ -1195,10 +1357,32 @@ export default function App() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 font-sans">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 font-sans text-gray-800 dark:text-white">
               <div className="md:col-span-2">
                 <PerformanceGraph semesters={student.semesters} darkMode={darkMode} />
+                <div className="mt-8 flex justify-start">
+                    <button 
+                    onClick={() => setShowForecastModal(true)}
+                    className={`px-8 py-3 rounded-2xl text-[10px] font-black tracking-widest uppercase transition-all flex items-center gap-3 group ${
+                      darkMode 
+                        ? 'bg-brand-primary/10 text-brand-primary border border-brand-primary/20 hover:bg-brand-primary/20' 
+                        : 'bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 shadow-sm'
+                    }`}
+                  >
+                    <svg className="w-4 h-4 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    Acheive Target CGPA
+                  </button>
+                </div>
               </div>
+              {showForecastModal && (
+                <AcademicForecastModal 
+                  student={student} 
+                  darkMode={darkMode} 
+                  onClose={() => setShowForecastModal(false)} 
+                />
+              )}
               {sortedSemesters.map((sem) => (
                 <SemesterCard 
                   key={sem.semester_number} 

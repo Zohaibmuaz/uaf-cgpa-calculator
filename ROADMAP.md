@@ -31,7 +31,8 @@ This checklist tracks the progress of the UAF Smart Calculator project. Tick the
 - [x] "The Podium" component (Top 3 Students).
 - [x] Table view for batch results with "Prune" (Trash) functionality.
 - [x] CSV/XLSX File Upload Mode (Targeted section analysis).
-- [x] "Pin this List" feature to save filtered sections.
+- [x] "View CSV Order" toggle with dynamic column labeling.
+- [x] Isolate View Mode State (Auto-cleanup on tab switch).
 
 ## Phase 6: Single Student Dashboard (Transcript Editor)
 - [x] Professional Transcript View UI.
@@ -40,14 +41,14 @@ This checklist tracks the progress of the UAF Smart Calculator project. Tick the
 - [x] Integration of SGPA Trajectory Line Graph (Recharts).
 - [x] Branded Native PDF Export (Text-selectable transcripts).
 
-## Phase 7: Advanced Features
+## Phase 7: Advanced Features (Current Focus)
 - [ ] **CGPA Predictor Algorithm:** Smart GPA distribution across semesters.
 - [ ] **Maintenance Mode:** "Safe Zone" GPA calculator.
 - [ ] **Head-to-Head (1v1):** Comparison view for two AG numbers.
 
 ## Phase 8: Final Polishing & Deployment
+- [x] Performance optimization (Lazy loading, state memoization).
 - [ ] UI/UX refinements (Nexus AI Digital aesthetic).
-- [ ] Performance optimization (Lazy loading, state memoization).
 - [ ] Backend deployment (Vercel/Render).
 - [ ] Frontend deployment (Hostinger/Static Hosting).
 
