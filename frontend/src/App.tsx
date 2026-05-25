@@ -159,13 +159,19 @@ const AcademicForecastModal = ({ student, darkMode, onClose }: { student: Studen
 
 const PerformanceGraph = ({ semesters, darkMode }: { semesters: Semester[], darkMode: boolean }) => {
   const data = useMemo(() => {
+    let regularCount = 1;
     return [...semesters]
       .sort((a, b) => a.semester_number - b.semester_number)
-      .map(s => ({
-        name: `S${s.semester_number}`,
-        sgpa: parseFloat(s.sgpa.toFixed(2)),
-        session: s.session_name
-      }));
+      .map(s => {
+        const isSummer = s.session_name.toLowerCase().includes('summer');
+        const label = isSummer ? 'SUMMER' : `S${regularCount}`;
+        if (!isSummer) regularCount++;
+        return {
+          name: label,
+          sgpa: parseFloat(s.sgpa.toFixed(2)),
+          session: s.session_name
+        };
+      });
   }, [semesters]);
 
   if (data.length === 0) return null;
@@ -453,7 +459,7 @@ const ExcludeSubjectsPopup = ({
           </button>
         </div>
 
-        <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4 opacity-60">Select subjects to exclude and re-rank.</p>
+        <p className={`text-[10px] font-black uppercase tracking-[0.2em] mb-4 ${darkMode ? 'text-brand-primary' : 'text-indigo-600'}`}>Select subjects to exclude and re-rank.</p>
         
         <div className="max-h-[650px] overflow-y-auto pr-4 space-y-2 custom-scrollbar">
           {subjects.map((sub) => (
@@ -507,13 +513,15 @@ const SemesterCard = ({
   darkMode, 
   onShowInfo,
   onDeleteSubject,
-  onAddSubject
+  onAddSubject,
+  visualLabel
 }: { 
   semester: Semester, 
   darkMode: boolean, 
   onShowInfo: (s: Subject) => void,
   onDeleteSubject: (semNum: number, subIdx: number) => void,
-  onAddSubject: (semNum: number) => void
+  onAddSubject: (semNum: number) => void,
+  visualLabel: string
 }) => {
   const getGradeStyle = (grade: string) => {
     switch (grade) {
@@ -537,7 +545,7 @@ const SemesterCard = ({
             </svg>
           </div>
           <div>
-            <h3 className="text-xl font-black text-gray-700 dark:text-gray-200 leading-tight uppercase tracking-tighter">SEMESTER {semester.semester_number}</h3>
+            <h3 className="text-xl font-black text-gray-700 dark:text-gray-200 leading-tight uppercase tracking-tighter">{visualLabel}</h3>
             <span className={`text-[10px] font-black uppercase tracking-[0.1em] block mt-0.5 ${darkMode ? 'text-brand-primary' : 'text-indigo-600'}`}>
               {semester.session_name}
             </span>
@@ -710,6 +718,28 @@ export default function App() {
   const totalCourses = useMemo(() => {
     if (!student) return 0;
     return student.semesters.reduce((acc, sem) => acc + sem.subjects.length, 0);
+  }, [student]);
+
+  const regularSemestersCount = useMemo(() => {
+    if (!student) return 0;
+    return student.semesters.filter(s => !s.session_name.toLowerCase().includes('summer')).length;
+  }, [student]);
+
+  const visualSemesterLabels = useMemo(() => {
+    if (!student) return new Map<number, string>();
+    const labels = new Map<number, string>();
+    let regularCount = 1;
+    [...student.semesters]
+      .sort((a, b) => a.semester_number - b.semester_number)
+      .forEach(sem => {
+        if (sem.session_name.toLowerCase().includes('summer')) {
+          labels.set(sem.semester_number, 'SUMMER SESSION');
+        } else {
+          labels.set(sem.semester_number, `SEMESTER ${regularCount}`);
+          regularCount++;
+        }
+      });
+    return labels;
   }, [student]);
 
   const sortedSemesters = useMemo(() => {
@@ -1349,7 +1379,7 @@ export default function App() {
             <div className="flex gap-4 mb-12 ml-6 text-gray-800 dark:text-white font-sans">
               <div className="flex items-center gap-3 bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.04] px-6 py-2.5 rounded-2xl shadow-sm transition-colors duration-500">
                 <div className={`w-2 h-2 rounded-full ${darkMode ? 'bg-brand-primary/60' : 'bg-green-500'}`}></div>
-                <span className="text-[10px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-widest">{student.semesters.length} Semesters Data</span>
+                <span className="text-[10px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-widest">{regularSemestersCount} Semesters Data</span>
               </div>
               <div className="flex items-center gap-3 bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.04] px-6 py-2.5 rounded-2xl shadow-sm transition-colors duration-500 font-sans">
                 <div className={`w-2 h-2 rounded-full ${darkMode ? 'bg-brand-secondary/60' : 'bg-indigo-500'}`}></div>
@@ -1391,6 +1421,7 @@ export default function App() {
                   onShowInfo={(sub) => setSelectedSubject(sub)}
                   onDeleteSubject={handleDeleteSubject}
                   onAddSubject={(semNum) => setAddingToSemester(semNum)}
+                  visualLabel={visualSemesterLabels.get(sem.semester_number) || ''}
                 />
               ))}
             </div>

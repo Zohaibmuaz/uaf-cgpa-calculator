@@ -175,8 +175,11 @@ class UAFScraper:
         def get_sem_order(name):
             match = re.search(r'(\d{4})', name)
             year = int(match.group(1)) if match else 0
-            is_winter = 0 if "Winter" in name else 1
-            return (year, is_winter)
+            if "Winter" in name: season = 0
+            elif "Spring" in name: season = 1
+            elif "Summer" in name: season = 2
+            else: season = 3
+            return (year, season)
 
         sorted_sessions = sorted(semester_map.keys(), key=get_sem_order)
         semesters = [Semester(semester_number=i+1, session_name=s, subjects=semester_map[s], sgpa=0.0) for i, s in enumerate(sorted_sessions)]

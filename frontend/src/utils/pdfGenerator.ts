@@ -45,9 +45,15 @@ export const generateTranscriptPDF = (student: StudentData) => {
   doc.text('BS COMPUTER SCIENCE', 130, 63);
 
   let currentY = 75;
+  let regularSemCount = 1;
+  const sortedSems = [...student.semesters].sort((a, b) => a.semester_number - b.semester_number);
 
   // 3. Semester Tables
-  student.semesters.forEach((sem) => {
+  sortedSems.forEach((sem) => {
+    const isSummer = sem.session_name.toLowerCase().includes('summer');
+    const visualLabel = isSummer ? 'SUMMER SESSION' : `SEM ${regularSemCount}`;
+    if (!isSummer) regularSemCount++;
+
     // Better page break check: header + approx table height
     const estimatedHeight = 25 + (sem.subjects.length * 8);
     if (currentY + estimatedHeight > 275) {
@@ -58,7 +64,7 @@ export const generateTranscriptPDF = (student: StudentData) => {
     doc.setFontSize(11);
     doc.setTextColor(...brandColor);
     doc.setFont('helvetica', 'bold');
-    doc.text(`${sem.session_name.toUpperCase()} (SEM ${sem.semester_number})`, 15, currentY);
+    doc.text(`${sem.session_name.toUpperCase()} (${visualLabel})`, 15, currentY);
     
     doc.setFontSize(9);
     doc.setTextColor(100, 100, 100);
