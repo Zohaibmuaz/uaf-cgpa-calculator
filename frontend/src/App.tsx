@@ -641,6 +641,133 @@ const SemesterCard = ({
 
 import { generateTranscriptPDF, generateClassReportPDF } from './utils/pdfGenerator';
 
+const GuidePage = ({ darkMode }: { darkMode: boolean }) => {
+  const features = [
+    {
+      title: "Single Transcript Search",
+      icon: (
+        <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 10h.01M15 10h.01M12 10h.01" />
+        </svg>
+      ),
+      description: "Instantly fetch any UAF student's record using their AG number. The system mimics a real browser to fetch data directly from the LMS securely.",
+      steps: ["Enter the Year (e.g. 2023)", "Enter the Registration ID (e.g. 10160)", "Click ANALYZE to fetch the complete academic history."]
+    },
+    {
+      title: "Class Result & Leaderboards",
+      icon: (
+        <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
+      description: "Upload a CSV or Excel file containing student AG numbers to generate a fully ranked class leaderboard with a beautiful podium visualization.",
+      steps: ["Switch to 'Class Result' mode", "Upload any sheet containing AG numbers", "The system auto-scans and extracts students for batch processing."]
+    },
+    {
+      title: "Academic Forecast Planner",
+      icon: (
+        <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+      ),
+      description: "Set your dream CGPA and let our AI-driven planner calculate exactly what SGPA you need to maintain in your remaining semesters.",
+      steps: ["Open a student transcript", "Click 'Achieve Target CGPA'", "Adjust your target and remaining semesters for real-time forecasting."]
+    },
+    {
+      title: "GPA Optimization Filters",
+      icon: (
+        <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+        </svg>
+      ),
+      description: "Experiment with your GPA by excluding specific subjects. Useful for 'Pass Only' courses or seeing how ranks change if certain subjects are ignored.",
+      steps: ["Generate a Class Leaderboard", "Open 'Filters'", "Toggle subjects to see how the entire class is instantly re-ranked."]
+    },
+    {
+      title: "Branded PDF Export",
+      icon: (
+        <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 9h1a1 1 0 110 2H9a1 1 0 010-2z" />
+        </svg>
+      ),
+      description: "Generate professional, text-searchable performance reports for individual students or the entire class leaderboard with Nexus AI branding.",
+      steps: ["Click 'Download Result' on a student or leaderboard", "The PDF includes a complete breakdown of Mid/Assignment/Final marks.", "Optimized for mobile viewing and high-quality printing."]
+    },
+    {
+      title: "Summer Session Handling",
+      icon: (
+        <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+        </svg>
+      ),
+      description: "Our system intelligently isolates Summer Sessions. They don't increment your regular semester count but their marks contribute to the CGPA correctly.",
+      steps: ["The system identifies 'Summer' in the session name", "A special 'SUMMER SESSION' badge is applied", "Calculations use 'Best Attempt' rules for repeated summer courses."]
+    }
+  ];
+
+  return (
+    <div className={`animate-in fade-in slide-in-from-bottom-12 duration-1000 max-w-6xl mx-auto font-sans`}>
+      <div className="text-center mb-20">
+        <h4 className={`text-[10px] font-black uppercase tracking-[0.4em] mb-4 ${darkMode ? 'text-brand-primary' : 'text-indigo-600'}`}>System Documentation</h4>
+        <h2 className={`text-5xl md:text-6xl font-black tracking-tighter uppercase leading-none mb-8 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Mastering the Smart Calculator</h2>
+        <p className="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto text-sm leading-relaxed font-medium uppercase tracking-widest">
+          A comprehensive guide to utilizing the full potential of UAF's most accurate academic intelligence tool.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {features.map((feature, idx) => (
+          <div key={idx} className={`p-10 rounded-[3rem] border transition-all duration-500 hover:scale-[1.02] relative overflow-hidden group ${
+            darkMode ? 'bg-[#0f0f0f] border-white/10 hover:border-brand-primary/30' : 'bg-white border-gray-100 hover:border-indigo-300 shadow-xl shadow-gray-200/20'
+          }`}>
+            <div className={`w-20 h-20 rounded-[2rem] flex items-center justify-center mb-8 shadow-sm transition-all group-hover:rotate-6 ${
+              darkMode ? 'bg-brand-primary/10 text-brand-primary' : 'bg-indigo-50 text-indigo-600'
+            }`}>
+              {feature.icon}
+            </div>
+            <h3 className="text-xl font-black uppercase tracking-tighter mb-4">{feature.title}</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-8 font-medium italic">
+              {feature.description}
+            </p>
+            <div className="space-y-3">
+              {feature.steps.map((step, sIdx) => (
+                <div key={sIdx} className="flex items-start gap-3">
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[9px] font-black ${
+                    darkMode ? 'bg-white/5 text-brand-primary border border-white/10' : 'bg-indigo-600 text-white'
+                  }`}>
+                    {sIdx + 1}
+                  </div>
+                  <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide leading-tight">{step}</p>
+                </div>
+              ))}
+            </div>
+            {darkMode && <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/5 blur-3xl rounded-full -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity"></div>}
+          </div>
+        ))}
+      </div>
+
+      <div className={`mt-20 p-12 rounded-[3.5rem] border text-center transition-all ${
+        darkMode ? 'bg-white/[0.02] border-white/5' : 'bg-indigo-600 text-white shadow-2xl shadow-indigo-200'
+      }`}>
+        <h3 className="text-2xl font-black uppercase tracking-tighter mb-4">Still have questions?</h3>
+        <p className={`text-sm mb-8 max-w-xl mx-auto font-medium ${darkMode ? 'text-gray-400' : 'text-indigo-100'}`}>
+          If you need further assistance or want to report a mathematical discrepancy, our support team is available 24/7.
+        </p>
+        <button 
+          onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
+          className={`px-10 py-4 rounded-2xl text-[10px] font-black tracking-widest uppercase transition-all ${
+            darkMode ? 'bg-brand-primary text-black hover:brightness-110' : 'bg-white text-indigo-600 hover:bg-gray-100'
+          }`}
+        >
+          Back to Top
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const ContactPage = ({ darkMode }: { darkMode: boolean }) => {
   return (
     <div className={`animate-in fade-in slide-in-from-bottom-12 duration-1000 max-w-4xl mx-auto rounded-[3rem] p-12 md:p-16 border shadow-2xl relative overflow-hidden ${
@@ -692,7 +819,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState('');
-  const [viewMode, setViewMode] = useState<'single' | 'batch' | 'csv' | 'saved' | 'contact'>('single');
+  const [viewMode, setViewMode] = useState<'single' | 'batch' | 'csv' | 'saved' | 'contact' | 'guide'>('single');
   const [darkMode, setDarkMode] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [leaderboardSearch, setLeaderboardSearch] = useState('');
@@ -1014,9 +1141,15 @@ export default function App() {
           <div className="flex items-center gap-6 mr-4 font-sans text-gray-800 dark:text-white">
             <button 
               onClick={() => setViewMode('single')} 
-              className={`text-[10px] font-black tracking-[0.3em] uppercase transition-all ${viewMode !== 'contact' ? (darkMode ? 'text-brand-primary border-b-2 border-brand-primary pb-0.5' : 'text-indigo-600 border-b-2 border-indigo-600 pb-0.5') : 'text-gray-400 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100'}`}
+              className={`text-[10px] font-black tracking-[0.3em] uppercase transition-all ${viewMode === 'single' || viewMode === 'batch' || viewMode === 'csv' || viewMode === 'saved' ? (darkMode ? 'text-brand-primary border-b-2 border-brand-primary pb-0.5' : 'text-indigo-600 border-b-2 border-indigo-600 pb-0.5') : 'text-gray-400 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100'}`}
             >
               HOME
+            </button>
+            <button 
+              onClick={() => setViewMode('guide')}
+              className={`text-[10px] font-black tracking-[0.3em] uppercase transition-all ${viewMode === 'guide' ? (darkMode ? 'text-brand-primary border-b-2 border-brand-primary pb-0.5' : 'text-indigo-600 border-b-2 border-indigo-600 pb-0.5') : 'text-gray-400 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100'}`}
+            >
+              GUIDE
             </button>
             <button 
               onClick={() => setViewMode('contact')}
@@ -1039,6 +1172,8 @@ export default function App() {
       <main className="container mx-auto px-6 py-12 max-w-7xl">
         {viewMode === 'contact' ? (
           <ContactPage darkMode={darkMode} />
+        ) : viewMode === 'guide' ? (
+          <GuidePage darkMode={darkMode} />
         ) : (
           <>
             <section className={`transition-all duration-700 ${student || batchResults.length > 0 ? 'mb-10' : 'py-20 text-center'}`}>
