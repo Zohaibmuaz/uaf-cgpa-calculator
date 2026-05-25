@@ -15,29 +15,33 @@ Whether you are checking a single transcript or analyzing an entire class sectio
 ## 🔥 Key Features
 
 ### 1. 💯 0% Fault Mathematical Engine
-*   **Precision Fractional Mathematics**: Retains exact floating-point precision for intermediate GPAs before calculating Quality Points, eliminating the common rounding errors found in other systems.
-*   **"Best Attempt" Repeats**: Intelligently scans a student's history to identify repeated courses and strictly uses only the highest-scoring attempt for the CGPA denominator.
-*   **Pass/Fail Handling**: Automatically ignores non-contributing grades (`P`, `W`, `I`, `S`, `U`) ensuring the CGPA is never artificially diluted.
+*   **Precision Fractional Mathematics**: Implements official UAF formulas for B, C, and D grades to maintain exact floating-point precision.
+*   **Intelligent "Best Attempt" Logic**: Automatically tracks course codes across multiple attempts. If a student repeats a course in a regular semester or Summer, the system strictly utilizes the attempt with the highest quality points for CGPA calculation.
+*   **Non-GPA Grade Handling**: Correctly filters out non-contributing grades (`P`, `W`, `I`, `S`, `U`) ensuring they do not affect the CGPA denominator.
 
-### 2. 📂 Class Result Analysis (CSV/XLSX Upload)
-*   **Zero-Configuration Uploads**: Upload any raw Excel (`.xlsx`, `.xls`), CSV, or Text file representing your section.
-*   **Smart Extraction**: The system uses intelligent Regex to auto-scan all spreadsheet cells, extract valid AG numbers, and fetch a complete class leaderboard instantly. No manual typing required.
+### 2. ☀️ Integrated Summer Session Support
+*   **Chronological Chronology**: Backend sorting logic ensures Summer sessions are accurately placed within the academic timeline (e.g., Summer 2024 appearing before Winter 2024-25).
+*   **Visual Distinction**: Summer sessions are uniquely branded as **"SUMMER SESSION"** in the UI and PDFs, ensuring they do not disrupt the sequential numbering of regular semesters.
+*   **Trajectory Accuracy**: The SGPA graph specifically labels summer data points to provide a clear view of academic progress.
 
-### 3. 📄 Premium Branded PDF Export
-*   **Text-Searchable Native PDFs**: Generates crystal-clear, text-selectable PDF documents for both Individual Transcripts and Class Leaderboards.
-*   **Detailed Marks Breakdown**: Unlike standard portals, the PDF explicitly shows Mid-Term, Assignment, Final, and Practical marks.
-*   **Official Aesthetic**: Branded with Nexus AI Digital and UAF official assets.
+### 3. 📂 Class Leaderboard & Smart Search
+*   **Zero-Configuration Uploads**: Supports raw Excel (`.xlsx`, `.xls`), CSV, or Text files.
+*   **Intelligent Regex Extraction**: Auto-scans all spreadsheet cells to extract valid AG numbers, fetching a complete class leaderboard instantly.
+*   **Dynamic Ranking & Filters**: View results in "Ranked Order" (by CGPA) or "CSV Order". Use powerful filters to exclude specific subjects from the entire class calculation to see how rankings shift.
 
-### 4. 🎨 Advanced Transcript Dashboard
-*   **Dark/Light Mode**: A sleek, responsive UI built with Tailwind CSS.
-*   **SGPA Trajectory Graph**: Visualizes academic performance across semesters using Recharts.
-*   **Dynamic Pruning**: Remove students from the batch leaderboard to instantly recalculate class rankings and the Top 3 Podium.
+### 4. 📄 Professional PDF Export
+*   **Native Transcript Generation**: Generates branded, text-searchable PDFs with detailed marks breakdowns (Mid-Term, Assignment, Final, Practical).
+*   **Class Reports**: Export the entire leaderboard with global rankings as a professional performance report.
+
+### 5. 🎯 Academic Forecast Planner
+*   **Target CGPA Predictor**: Calculate the exact SGPA required in remaining semesters to reach a target CGPA goal.
+*   **Credit Hour Customization**: Dynamically adjust remaining credit hours to see real-time impact on future academic requirements.
 
 ---
 
 ## 💻 Tech Stack
-*   **Frontend**: React 19, TypeScript, Vite, Tailwind CSS v4, Recharts, SheetJS, jsPDF.
-*   **Backend**: Python, FastAPI, aiohttp (Async Scraping), BeautifulSoup4, Pydantic.
+*   **Frontend**: React 19, TypeScript, Vite, Tailwind CSS v4 (with Dark Mode support), Recharts, SheetJS, jsPDF.
+*   **Backend**: Python, FastAPI, aiohttp (Asynchronous Scraping), BeautifulSoup4, Pydantic.
 *   **Architecture**: Decoupled Client-Server model with asynchronous background fetching and memory-mapped math caching.
 
 ---
