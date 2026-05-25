@@ -523,6 +523,8 @@ const SemesterCard = ({
   onAddSubject: (semNum: number) => void,
   visualLabel: string
 }) => {
+  const [isExpanded, setIsExpanded] = useState(true);
+
   const getGradeStyle = (grade: string) => {
     switch (grade) {
       case 'A': return darkMode ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-700';
@@ -536,109 +538,110 @@ const SemesterCard = ({
   };
 
   return (
-    <div className="bg-white dark:bg-[#111111] border border-gray-100 dark:border-white/[0.06] rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:border-brand-primary/20 shadow-xl shadow-gray-200/20 dark:shadow-none font-sans">
-      <div className="p-8 flex justify-between items-center border-b border-gray-100 dark:border-white/[0.04] bg-gray-50/30 dark:bg-white/[0.01]">
-        <div className="flex items-center gap-5">
-          <div className={`w-14 h-14 bg-brand-primary/10 rounded-2xl flex items-center justify-center text-brand-primary shadow-inner border border-brand-primary/20 transition-colors`}>
-            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+    <div className="bg-white dark:bg-[#111111] border border-gray-100 dark:border-white/[0.06] rounded-[2rem] md:rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:border-brand-primary/20 shadow-xl shadow-gray-200/20 dark:shadow-none font-sans">
+      <div 
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="p-6 md:p-8 flex justify-between items-center border-b border-gray-100 dark:border-white/[0.04] bg-gray-50/30 dark:bg-white/[0.01] cursor-pointer group/card"
+      >
+        <div className="flex items-center gap-3 md:gap-5">
+          <div className={`w-10 h-10 md:w-14 md:h-14 bg-brand-primary/10 rounded-xl md:rounded-2xl flex items-center justify-center text-brand-primary shadow-inner border border-brand-primary/20 transition-all ${!isExpanded ? 'rotate-[-90deg]' : ''}`}>
+            <svg className={`w-5 h-5 md:w-8 md:h-8 transition-transform duration-500 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
             </svg>
           </div>
           <div>
-            <h3 className="text-xl font-black text-gray-700 dark:text-gray-200 leading-tight uppercase tracking-tighter">{visualLabel}</h3>
-            <span className={`text-[10px] font-black uppercase tracking-[0.1em] block mt-0.5 ${darkMode ? 'text-brand-primary' : 'text-indigo-600'}`}>
+            <h3 className="text-lg md:text-xl font-black text-gray-700 dark:text-gray-200 leading-tight uppercase tracking-tighter">{visualLabel}</h3>
+            <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.1em] block mt-0.5 ${darkMode ? 'text-brand-primary' : 'text-indigo-600'}`}>
               {semester.session_name}
             </span>
           </div>
         </div>
-        <div className="text-right flex items-center gap-4">
+        <div className="text-right flex items-center gap-2 md:gap-4">
           <button 
-            onClick={() => onAddSubject(semester.semester_number)}
-            className="group relative w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/[0.03] flex items-center justify-center transition-all hover:bg-brand-primary/20 hover:text-brand-primary text-gray-400"
+            onClick={(e) => { e.stopPropagation(); onAddSubject(semester.semester_number); }}
+            className="group relative w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-gray-100 dark:bg-white/[0.03] flex items-center justify-center transition-all hover:bg-brand-primary/20 hover:text-brand-primary text-gray-400"
           >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
-            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[8px] font-black uppercase rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap">
-              Add Subject
-            </div>
+            <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
           </button>
-          <div>
-            <span className="text-[9px] text-gray-500 font-black block uppercase tracking-widest mb-1 leading-none">GPA</span>
-            <span className={`text-3xl font-black leading-none tracking-tighter italic ${darkMode ? 'text-brand-primary/90' : 'text-indigo-600'}`}>{semester.sgpa.toFixed(2)}</span>
+          <div className="flex flex-col items-end">
+            <span className="text-[8px] md:text-[9px] text-gray-500 font-black block uppercase tracking-widest mb-1 leading-none">GPA</span>
+            <span className={`text-2xl md:text-3xl font-black leading-none tracking-tighter italic ${darkMode ? 'text-brand-primary/90' : 'text-indigo-600'}`}>{semester.sgpa.toFixed(2)}</span>
           </div>
         </div>
       </div>
 
-      <div className="p-8">
-        <div className="overflow-hidden rounded-3xl border border-gray-100 dark:border-white/[0.04] bg-white dark:bg-white/[0.01]">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-gray-50/50 dark:bg-white/[0.02] text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-[0.3em]">
-                <th className="px-6 py-5">COURSE</th>
-                <th className="px-6 py-5 text-center">HRS</th>
-                <th className="px-6 py-5 text-center">MARKS</th>
-                <th className="px-6 py-5 text-center">GRADE</th>
-                <th className="px-6 py-5 text-center">GP</th>
-                <th className="px-6 py-5 text-right"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-white/[0.04]">
-              {semester.subjects.map((sub, idx) => (
-                <tr key={idx} className={`group transition-colors ${darkMode ? 'hover:bg-brand-primary/[0.02]' : 'hover:bg-indigo-50/50'}`}>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[15px] font-black text-gray-800 dark:text-white uppercase font-sans tracking-tight">
-                        {sub.course_code || sub.name}
-                      </span>
-                      <button onClick={() => onShowInfo(sub)} className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-gray-400 dark:text-gray-600 shrink-0">
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                      </button>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-center">
-                    <div className="flex flex-col items-center justify-center">
-                      <div className="flex items-center gap-0.5">
-                        <span className="text-[12px] text-gray-800 dark:text-white font-black font-sans">
-                          {sub.credit_hours}
-                        </span>
-                        <span className="text-[11px] text-gray-400 font-bold">({sub.credit_hours}-{sub.credit_hours > 2 ? '1' : '0'})</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-center">
-                    <span className="text-[12px] text-gray-800 dark:text-white font-black font-sans">
-                      {sub.obtained_marks}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 text-center">
-                    <div className="flex justify-center">
-                      <span className={`w-7 h-7 flex items-center justify-center rounded-lg text-[11px] font-black ${getGradeStyle(sub.grade)}`}>
-                        {sub.grade}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-center">
-                    <span className={`text-[14px] font-black italic font-sans ${darkMode ? 'text-brand-primary' : 'text-indigo-600'}`}>
-                      {(sub.grade_points * sub.credit_hours).toFixed(2)}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <button 
-                      onClick={() => onDeleteSubject(semester.semester_number, idx)}
-                      className="p-2 hover:bg-red-500/10 text-gray-500 dark:text-gray-400 hover:text-red-500 rounded-lg transition-all"
-                    >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
-                  </td>
+      <div className={`transition-all duration-500 overflow-hidden ${isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className="p-4 md:p-8">
+          <div className="overflow-x-auto custom-scrollbar rounded-2xl md:rounded-3xl border border-gray-100 dark:border-white/[0.04] bg-white dark:bg-white/[0.01]">
+            <table className="w-full text-left border-collapse min-w-[500px] md:min-w-full">
+              <thead>
+                <tr className="bg-gray-50/50 dark:bg-white/[0.02] text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-[0.3em]">
+                  <th className="px-6 py-5">COURSE</th>
+                  <th className="px-6 py-5 text-center">HRS</th>
+                  <th className="px-6 py-5 text-center">MARKS</th>
+                  <th className="px-6 py-5 text-center">GRADE</th>
+                  <th className="px-6 py-5 text-center">GP</th>
+                  <th className="px-6 py-5 text-right"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-100 dark:divide-white/[0.04]">
+                {semester.subjects.map((sub, idx) => (
+                  <tr key={idx} className={`group transition-colors ${darkMode ? 'hover:bg-brand-primary/[0.02]' : 'hover:bg-indigo-50/50'}`}>
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[14px] md:text-[15px] font-black text-gray-800 dark:text-white uppercase font-sans tracking-tight">
+                          {sub.course_code || sub.name}
+                        </span>
+                        <button onClick={() => onShowInfo(sub)} className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-gray-400 dark:text-gray-600 shrink-0">
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="flex items-center gap-0.5">
+                          <span className="text-[12px] text-gray-800 dark:text-white font-black font-sans">
+                            {sub.credit_hours}
+                          </span>
+                          <span className="text-[10px] md:text-[11px] text-gray-400 font-bold">({sub.credit_hours}-{sub.credit_hours > 2 ? '1' : '0'})</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <span className="text-[12px] text-gray-800 dark:text-white font-black font-sans">
+                        {sub.obtained_marks}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <div className="flex justify-center">
+                        <span className={`w-7 h-7 flex items-center justify-center rounded-lg text-[11px] font-black ${getGradeStyle(sub.grade)}`}>
+                          {sub.grade}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <span className={`text-[13px] md:text-[14px] font-black italic font-sans ${darkMode ? 'text-brand-primary' : 'text-indigo-600'}`}>
+                        {(sub.grade_points * sub.credit_hours).toFixed(2)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                      <button 
+                        onClick={() => onDeleteSubject(semester.semester_number, idx)}
+                        className="p-2 hover:bg-red-500/10 text-gray-500 dark:text-gray-400 hover:text-red-500 rounded-lg transition-all"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
   );
 };
-
 import { generateTranscriptPDF, generateClassReportPDF } from './utils/pdfGenerator';
 
 const GuidePage = ({ darkMode, onContactClick }: { darkMode: boolean, onContactClick: () => void }) => {
@@ -1138,7 +1141,7 @@ export default function App() {
           </div>
         </div>
         <div className="flex items-center gap-8">
-          <div className="flex items-center gap-6 mr-4 font-sans text-gray-800 dark:text-white">
+          <div className="hidden md:flex items-center gap-6 mr-4 font-sans text-gray-800 dark:text-white">
             <button 
               onClick={() => setViewMode('single')} 
               className={`text-[10px] font-black tracking-[0.3em] uppercase transition-all ${viewMode === 'single' || viewMode === 'batch' || viewMode === 'csv' || viewMode === 'saved' ? (darkMode ? 'text-brand-primary border-b-2 border-brand-primary pb-0.5' : 'text-indigo-600 border-b-2 border-indigo-600 pb-0.5') : 'text-gray-400 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100'}`}
@@ -1165,7 +1168,7 @@ export default function App() {
           >
             <span className="text-xl leading-none select-none text-gray-800 dark:text-white font-sans">{darkMode ? '☀️' : '🌙'}</span>
           </button>
-          <div className="h-6 w-px bg-gray-200 dark:bg-white/10 font-sans"></div>
+          <div className="h-6 w-px bg-gray-200 dark:bg-white/10 font-sans hidden md:block"></div>
         </div>
       </nav>
 
@@ -1179,10 +1182,10 @@ export default function App() {
             <section className={`transition-all duration-700 ${student || batchResults.length > 0 ? 'mb-10' : 'py-20 text-center'}`}>
           {!(student || batchResults.length > 0) && (
             <>
-              <h2 className={`text-6xl md:text-8xl font-black mb-6 tracking-tighter bg-clip-text text-transparent ${darkMode ? 'bg-gradient-to-b from-white to-white/10' : 'bg-gradient-to-b from-gray-900 to-gray-400'}`}>
+              <h2 className={`text-4xl md:text-8xl font-black mb-6 tracking-tighter bg-clip-text text-transparent ${darkMode ? 'bg-gradient-to-b from-white to-white/10' : 'bg-gradient-to-b from-gray-900 to-gray-400'}`}>
                 CGPA <span className={`${darkMode ? 'text-brand-primary/80' : 'text-indigo-600'} italic`}>CALCULATOR</span>
               </h2>
-              <p className="text-gray-500 dark:text-gray-500 font-medium max-w-2xl mx-auto text-lg leading-relaxed mb-16 italic font-sans text-gray-800 dark:text-white/80">
+              <p className="text-gray-500 dark:text-gray-500 font-medium max-w-2xl mx-auto text-sm md:text-lg leading-relaxed mb-16 italic font-sans text-gray-800 dark:text-white/80 px-4">
                 UAF CGPA Calculator - Enter your registration number and get instant results.
               </p>
             </>
@@ -1474,31 +1477,32 @@ export default function App() {
         {student && (
           <div className="animate-in fade-in slide-in-from-bottom-12 duration-1000">
              {/* Compact Student Banner */}
-            <div className={`border rounded-[2.5rem] p-10 flex flex-col md:flex-row justify-between items-center mb-10 relative overflow-hidden shadow-xl transition-all duration-500 ${
+            <div className={`border rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 flex flex-col md:flex-row justify-between items-center mb-10 relative overflow-hidden shadow-xl transition-all duration-500 ${
               darkMode ? 'bg-[#0c0c0c] border-white/[0.04]' : 'bg-white border-gray-100'
             }`}>
               {darkMode && <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-primary/5 blur-[120px] -mr-80 -mt-80 font-sans"></div>}
-              <div className="flex items-center gap-8 z-10 text-gray-800 dark:text-white font-sans font-sans">
-                <div className={`w-20 h-20 rounded-[2rem] flex items-center justify-center shadow-lg border transition-colors ${
+              <div className="flex flex-col md:flex-row items-center gap-5 md:gap-8 z-10 text-gray-800 dark:text-white font-sans w-full md:w-auto">
+                <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl md:rounded-[2rem] flex items-center justify-center shadow-lg border transition-colors ${
                   darkMode ? 'bg-brand-primary/5 text-brand-primary/60 border-brand-primary/10' : 'bg-indigo-50 text-indigo-600 border-indigo-100'
                 }`}>
-                  <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-2.75.191 1 1 0 00-.246.162l-3 3a1 1 0 001.414 1.414l2.583-2.583c.311.954.83 1.834 1.533 2.566l2.316 2.317a1 1 0 001.414-1.414l-2.317-2.316a7.003 7.003 0 01-1.343-1.63L11 12.12v-4.102l-1.31-.562a1 1 0 00-.787 0l-5.593 2.397z"/><path d="M14.903 12.355l-2.518 1.08a1 1 0 00-.787 1.838l2.518-1.08a1 1 0 00.787-1.838z"/></svg>
+                  <svg className="w-8 h-8 md:w-10 md:h-10" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-2.75.191 1 1 0 00-.246.162l-3 3a1 1 0 001.414 1.414l2.583-2.583c.311.954.83 1.834 1.533 2.566l2.316 2.317a1 1 0 001.414-1.414l-2.317-2.316a7.003 7.003 0 01-1.343-1.63L11 12.12v-4.102l-1.31-.562a1 1 0 00-.787 0l-5.593 2.397z"/><path d="M14.903 12.355l-2.518 1.08a1 1 0 00-.787 1.838l2.518-1.08a1 1 0 00.787-1.838z"/></svg>
                 </div>
-                <div>
-                  <h2 className="text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tighter uppercase leading-none font-sans">{student.name}</h2>
-                  <div className="flex items-center gap-4 mt-3 font-sans">
-                    <span className={`text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-[0.2em] border shadow-sm ${
+                <div className="text-center md:text-left">
+                  <h2 className="text-2xl md:text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tighter uppercase leading-none font-sans">{student.name}</h2>
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 md:gap-4 mt-3 font-sans">
+                    <span className={`text-[8px] md:text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-[0.2em] border shadow-sm ${
                       darkMode ? 'bg-brand-primary/10 text-brand-primary/80 border-brand-primary/10' : 'bg-green-50 text-green-700 border-green-100'
                     }`}>Verified Record</span>
-                    <span className="text-gray-400 dark:text-gray-600 font-bold text-lg tracking-tighter uppercase font-sans">{student.ag_number}</span>
+                    <span className="text-gray-400 dark:text-gray-600 font-bold text-base md:text-lg tracking-tighter uppercase font-sans">{student.ag_number}</span>
                   </div>
                 </div>
               </div>
-              <div className="text-right z-10 mt-10 md:mt-0 font-sans text-gray-800 dark:text-white">
-                <div className="flex items-center gap-2 justify-end mb-1 text-gray-400 dark:text-gray-600">
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em]">Cumulative GPA</span>
+              <div className="text-center md:text-right z-10 mt-8 md:mt-0 font-sans text-gray-800 dark:text-white w-full md:w-auto">
+                <div className="flex items-center gap-2 justify-center md:justify-end mb-1 text-gray-400 dark:text-gray-600">
+                  <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] md:tracking-[0.4em]">Cumulative GPA</span>
                 </div>
-                <div className="flex items-center gap-4 mt-6 justify-end">
+                <div className={`text-5xl md:text-7xl font-black leading-none tracking-tighter italic ${darkMode ? 'text-white' : 'text-gray-900'}`}>{student.cgpa.toFixed(2)}</div>
+                <div className="flex items-center gap-4 mt-4 md:mt-6 justify-center md:justify-end">
                   <button 
                     onClick={() => generateTranscriptPDF(student)}
                     className={`px-6 py-2.5 rounded-2xl text-[9px] font-black tracking-widest uppercase transition-all flex items-center gap-2 ${darkMode ? 'bg-brand-primary text-black hover:brightness-110 shadow-lg shadow-brand-primary/10' : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-100'}`}
@@ -1507,7 +1511,6 @@ export default function App() {
                     Download Result
                   </button>
                 </div>
-                <div className={`text-7xl font-black leading-none tracking-tighter italic ${darkMode ? 'text-white' : 'text-gray-900'}`}>{student.cgpa.toFixed(2)}</div>
               </div>
             </div>
 
