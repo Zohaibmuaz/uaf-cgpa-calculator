@@ -641,7 +641,7 @@ const SemesterCard = ({
 
 import { generateTranscriptPDF, generateClassReportPDF } from './utils/pdfGenerator';
 
-const GuidePage = ({ darkMode }: { darkMode: boolean }) => {
+const GuidePage = ({ darkMode, onContactClick }: { darkMode: boolean, onContactClick: () => void }) => {
   const features = [
     {
       title: "Single Transcript Search",
@@ -756,12 +756,12 @@ const GuidePage = ({ darkMode }: { darkMode: boolean }) => {
           If you need further assistance or want to report a mathematical discrepancy, our support team is available 24/7.
         </p>
         <button 
-          onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
+          onClick={onContactClick}
           className={`px-10 py-4 rounded-2xl text-[10px] font-black tracking-widest uppercase transition-all ${
             darkMode ? 'bg-brand-primary text-black hover:brightness-110' : 'bg-white text-indigo-600 hover:bg-gray-100'
           }`}
         >
-          Back to Top
+          Get In Touch
         </button>
       </div>
     </div>
@@ -1173,7 +1173,7 @@ export default function App() {
         {viewMode === 'contact' ? (
           <ContactPage darkMode={darkMode} />
         ) : viewMode === 'guide' ? (
-          <GuidePage darkMode={darkMode} />
+          <GuidePage darkMode={darkMode} onContactClick={() => setViewMode('contact')} />
         ) : (
           <>
             <section className={`transition-all duration-700 ${student || batchResults.length > 0 ? 'mb-10' : 'py-20 text-center'}`}>
