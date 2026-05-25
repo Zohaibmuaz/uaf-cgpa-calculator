@@ -728,7 +728,7 @@ const GuidePage = ({ darkMode }: { darkMode: boolean }) => {
               {feature.icon}
             </div>
             <h3 className="text-xl font-black uppercase tracking-tighter mb-4">{feature.title}</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-8 font-medium italic">
+            <p className="text-xs text-slate-600 dark:text-gray-300 leading-relaxed mb-8 font-medium">
               {feature.description}
             </p>
             <div className="space-y-3">
