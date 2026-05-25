@@ -1320,12 +1320,13 @@ export default function App() {
                 <button 
                   onClick={fetchResults}
                   disabled={loading}
-                  className={`px-10 py-4 rounded-[1.8rem] font-black tracking-widest shadow-xl transition-all flex items-center gap-3 text-sm whitespace-nowrap ${
+                  className={`px-6 md:px-10 py-4 rounded-[1.5rem] md:rounded-[1.8rem] font-black tracking-widest shadow-xl transition-all flex items-center justify-center gap-3 text-sm whitespace-nowrap ${
                     darkMode ? 'bg-brand-primary/90 text-black shadow-brand-primary/10 hover:brightness-105' : 'bg-indigo-600 text-white shadow-indigo-200 hover:bg-indigo-700'
                   } active:scale-95`}
                 >
-                  {loading ? (viewMode === 'batch' ? `${Math.round(progress)}%` : '...') : 'ANALYZE'}
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                  <span className="hidden md:inline">{loading ? (viewMode === 'batch' ? `${Math.round(progress)}%` : '...') : 'ANALYZE'}</span>
+                  {loading && !darkMode && <span className="md:hidden">...</span>}
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </button>
               </div>
 
