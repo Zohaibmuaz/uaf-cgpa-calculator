@@ -1002,7 +1002,7 @@ export default function App() {
             <img 
               src="/uafnelogo.webp" 
               alt="UAF Logo" 
-              className={`w-full h-full object-contain ${darkMode ? 'brightness-125 contrast-110' : 'mix-blend-multiply'}`} 
+              className={`w-full h-full object-contain transition-all duration-700 ${darkMode ? 'invert-[1] hue-rotate-[180deg] brightness-[1.1] contrast-[1.1]' : 'mix-blend-multiply'}`} 
             />
           </div>
           <div>
