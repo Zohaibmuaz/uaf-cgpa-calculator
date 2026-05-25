@@ -455,7 +455,7 @@ const ExcludeSubjectsPopup = ({
             <h3 className="text-3xl font-black tracking-tighter uppercase leading-none text-gray-800 dark:text-white">Exclude Subjects</h3>
           </div>
           <button onClick={onClose} className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${darkMode ? 'hover:bg-white/5 bg-white/[0.02]' : 'hover:bg-gray-50 bg-gray-50/50'}`}>
-            <svg className="w-6 h-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
 
@@ -589,7 +589,7 @@ const SemesterCard = ({
                   <tr key={idx} className={`group transition-colors ${darkMode ? 'hover:bg-brand-primary/[0.02]' : 'hover:bg-indigo-50/50'}`}>
                     <td className="px-2 py-3 md:py-4">
                       <div className="flex items-center gap-1">
-                        <span className="text-[12px] md:text-[15px] font-black text-gray-800 dark:text-white uppercase font-sans tracking-tighter md:tracking-tight">
+                        <span className="text-[11px] md:text-[15px] font-black text-gray-800 dark:text-white uppercase font-sans tracking-tight">
                           {sub.course_code || sub.name}
                         </span>
                         <button onClick={() => onShowInfo(sub)} className="p-0.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-gray-400 dark:text-gray-600 shrink-0">
@@ -618,7 +618,7 @@ const SemesterCard = ({
                       </div>
                     </td>
                     <td className="px-2 py-3 md:py-4 text-center">
-                      <span className={`text-[11px] md:text-[14px] font-black italic font-sans ${darkMode ? 'text-brand-primary' : 'text-indigo-600'}`}>
+                      <span className={`text-[10px] md:text-[14px] font-black italic font-sans ${darkMode ? 'text-brand-primary' : 'text-indigo-600'}`}>
                         {(sub.grade_points * sub.credit_hours).toFixed(1)}
                       </span>
                     </td>
@@ -627,7 +627,7 @@ const SemesterCard = ({
                         onClick={() => onDeleteSubject(semester.semester_number, idx)}
                         className="p-1.5 md:p-2 hover:bg-red-500/10 text-gray-500 dark:text-gray-400 hover:text-red-500 rounded-lg transition-all"
                       >
-                        <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                       </button>
                     </td>
                   </tr>
@@ -831,6 +831,7 @@ export default function App() {
   const [uploadedFilename, setUploadedFilename] = useState<string>('');
   const [sortMode, setSortMode] = useState<'ranked' | 'original'>('ranked');
   const [showForecastModal, setShowForecastModal] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -1125,7 +1126,10 @@ export default function App() {
       )}
 
       <nav className="px-10 py-5 flex justify-between items-center backdrop-blur-2xl border-b border-gray-100 dark:border-white/[0.04] sticky top-0 z-50 bg-white/70 dark:bg-brand-dark/60 transition-colors duration-500 text-gray-800 dark:text-white font-sans">
-        <div className="flex items-center gap-4 text-gray-800 dark:text-white">
+        <div 
+          onClick={() => { setViewMode('single'); setStudent(null); setBatchResults([]); setIsMobileMenuOpen(false); }}
+          className="flex items-center gap-4 text-gray-800 dark:text-white cursor-pointer group active:scale-95 transition-all"
+        >
           <div className="w-12 h-12 flex items-center justify-center bg-transparent">
             <img 
               src="/uafnelogo.webp" 
@@ -1134,11 +1138,11 @@ export default function App() {
             />
           </div>
           <div>
-            <h1 className="text-lg font-black tracking-tighter leading-none uppercase">UAF CGPA</h1>
+            <h1 className="text-lg font-black tracking-tighter leading-none uppercase group-hover:text-brand-primary transition-colors">UAF CGPA</h1>
             <span className="text-[9px] font-bold text-gray-400 dark:text-gray-500 tracking-[0.3em] uppercase leading-none font-sans">Calculator</span>
           </div>
         </div>
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-4 md:gap-8">
           <div className="hidden md:flex items-center gap-6 mr-4 font-sans text-gray-800 dark:text-white">
             <button 
               onClick={() => setViewMode('single')} 
@@ -1166,9 +1170,51 @@ export default function App() {
           >
             <span className="text-xl leading-none select-none text-gray-800 dark:text-white font-sans">{darkMode ? '☀️' : '🌙'}</span>
           </button>
+
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden w-11 h-11 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-white/[0.05] transition-all shadow-sm bg-white dark:bg-transparent active:scale-95 text-gray-500"
+          >
+            <svg className={`w-6 h-6 transition-transform duration-300 ${isMobileMenuOpen ? 'rotate-90 text-brand-primary' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            </svg>
+          </button>
+          
           <div className="h-6 w-px bg-gray-200 dark:bg-white/10 font-sans hidden md:block"></div>
         </div>
       </nav>
+
+      {/* Mobile Dropdown Menu */}
+      <div className={`md:hidden fixed top-24 left-6 right-6 z-[60] transition-all duration-500 ease-out origin-top ${
+        isMobileMenuOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'
+      }`}>
+        <div className={`p-4 rounded-[2.5rem] border shadow-[0_30px_70px_rgba(0,0,0,0.3)] backdrop-blur-3xl transition-colors duration-500 ${
+          darkMode ? 'bg-[#0f0f0f]/90 border-white/10 text-white shadow-brand-primary/5' : 'bg-white/90 border-gray-100 text-gray-800 shadow-indigo-100'
+        }`}>
+          <div className="space-y-1">
+            {[
+              { id: 'single', label: 'HOME', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+              { id: 'guide', label: 'GUIDE', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
+              { id: 'contact', label: 'CONTACT', icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' }
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => { setViewMode(item.id as any); setIsMobileMenuOpen(false); setStudent(null); setBatchResults([]); }}
+                className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-black text-[10px] tracking-[0.3em] ${
+                  (viewMode === item.id || (item.id === 'single' && (viewMode === 'batch' || viewMode === 'csv' || viewMode === 'saved')))
+                    ? (darkMode ? 'bg-brand-primary text-black' : 'bg-indigo-600 text-white shadow-lg shadow-indigo-100')
+                    : (darkMode ? 'hover:bg-white/5 text-gray-400' : 'hover:bg-gray-50 text-gray-500')
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
+                </svg>
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <main className="container mx-auto px-6 py-12 max-w-7xl">
         {viewMode === 'contact' ? (
@@ -1361,7 +1407,8 @@ export default function App() {
                   <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gray-100 dark:bg-white/5 border-2 border-gray-200 dark:border-white/10 flex items-center justify-center text-xl md:text-2xl font-black mb-4 group-hover:scale-110 transition-transform">🥈</div>
                   <div className="text-xl md:text-3xl font-black text-gray-400 italic mb-4 font-sans">{rankedStudents[1].cgpa.toFixed(2)}</div>
                   <div className="h-20 md:h-32 w-full bg-gradient-to-t from-gray-100 dark:from-white/5 to-transparent rounded-t-2xl md:rounded-t-3xl border-x-2 border-t-2 border-gray-200 dark:border-white/10 p-2 md:p-6 text-center">
-                    <div className="text-[8px] md:text-[10px] font-black uppercase tracking-widest truncate">{rankedStudents[1].name}</div>
+                    <div className="text-[7px] md:text-[10px] font-black uppercase tracking-tight md:tracking-widest leading-none whitespace-normal break-words">{rankedStudents[1].name}</div>
+                    <div className="text-[6px] md:text-[9px] font-bold text-gray-400 opacity-60 uppercase mt-1 leading-none">{rankedStudents[1].ag_number}</div>
                   </div>
                 </div>
               )}
@@ -1372,8 +1419,8 @@ export default function App() {
                   <div className="text-3xl md:text-5xl font-black text-orange-500 dark:text-brand-primary italic mb-6 font-sans">{rankedStudents[0].cgpa.toFixed(2)}</div>
                   <div className="h-32 md:h-48 w-full bg-gradient-to-t from-orange-500/10 dark:from-brand-primary/10 to-transparent rounded-t-[2rem] md:rounded-t-[3rem] border-x-4 border-t-4 border-orange-500 dark:border-brand-primary p-3 md:p-8 text-center relative overflow-hidden">
                     {darkMode && <div className="absolute inset-0 bg-brand-primary/5 blur-3xl -z-10"></div>}
-                    <div className="text-[10px] md:text-xs font-black uppercase tracking-widest mb-1 truncate">{rankedStudents[0].name}</div>
-                    <div className="text-[7px] md:text-[9px] font-bold text-orange-500 dark:text-brand-primary opacity-60 uppercase">{rankedStudents[0].ag_number}</div>
+                    <div className="text-[8px] md:text-xs font-black uppercase tracking-tight md:tracking-widest leading-none whitespace-normal break-words">{rankedStudents[0].name}</div>
+                    <div className="text-[7px] md:text-[9px] font-bold text-orange-500 dark:text-brand-primary opacity-60 uppercase mt-1 leading-none">{rankedStudents[0].ag_number}</div>
                   </div>
                 </div>
               )}
@@ -1383,7 +1430,8 @@ export default function App() {
                   <div className="w-10 h-10 md:w-14 md:h-14 rounded-2xl bg-orange-900/10 dark:bg-orange-900/20 border-2 border-orange-700/30 flex items-center justify-center text-lg md:text-xl font-black mb-4 group-hover:scale-110 transition-transform">🥉</div>
                   <div className="text-xl md:text-3xl font-black text-orange-700/60 italic mb-4 font-sans">{rankedStudents[2].cgpa.toFixed(2)}</div>
                   <div className="h-16 md:h-24 w-full bg-gradient-to-t from-orange-900/10 dark:from-orange-900/20 to-transparent rounded-t-xl md:rounded-t-3xl border-x-2 border-t-2 border-orange-700/30 p-2 md:p-5 text-center">
-                    <div className="text-[8px] md:text-[10px] font-black uppercase tracking-widest truncate">{rankedStudents[2].name}</div>
+                    <div className="text-[7px] md:text-[10px] font-black uppercase tracking-tight md:tracking-widest leading-none whitespace-normal break-words">{rankedStudents[2].name}</div>
+                    <div className="text-[6px] md:text-[9px] font-bold text-orange-700 opacity-60 uppercase mt-1 leading-none">{rankedStudents[2].ag_number}</div>
                   </div>
                 </div>
               )}
@@ -1453,8 +1501,8 @@ export default function App() {
                          {sortMode === 'ranked' ? `#${s.globalRank}` : `${index + 1}`}
                        </span>
                      </td>                      <td className="px-3 md:px-10 py-4 md:py-6 cursor-pointer" onClick={() => { setStudent(s); window.scrollTo({top: 400, behavior: 'smooth'}); }}>
-                        <div className="font-black text-sm md:text-lg uppercase leading-none tracking-tighter truncate max-w-[80px] md:max-w-none">{s.name}</div>
-                        <div className="text-[8px] md:text-[10px] font-bold text-gray-400 mt-1 font-mono tracking-widest uppercase">{s.ag_number}</div>
+                        <div className="font-black text-[11px] md:text-lg uppercase leading-none tracking-tight whitespace-normal break-words">{s.name}</div>
+                        <div className="text-[7px] md:text-[10px] font-bold text-gray-400 mt-1 font-mono tracking-widest uppercase">{s.ag_number}</div>
                       </td>
                       <td className="px-2 md:px-10 py-4 md:py-6 text-center font-bold cursor-pointer" onClick={() => { setStudent(s); window.scrollTo({top: 400, behavior: 'smooth'}); }}>
                         <span className="bg-gray-100 dark:bg-white/5 px-2 py-0.5 rounded-lg text-[9px] md:text-[10px] font-black text-gray-400 font-sans">{s.semesters.reduce((acc, sem) => acc + sem.subjects.length, 0)}</span>
