@@ -4,7 +4,7 @@ import type { StudentData } from './engine';
 
 export const generateTranscriptPDF = (student: StudentData) => {
   const doc = new jsPDF();
-  const brandColor = [79, 70, 229]; // Indigo-600
+  const brandColor: [number, number, number] = [79, 70, 229]; // Indigo-600
   const nexusLogo = '/nexuslogo.png';
 
   // 1. Header & Logo
@@ -115,7 +115,7 @@ export const generateTranscriptPDF = (student: StudentData) => {
 
 export const generateClassReportPDF = (students: any[], sortMode: 'ranked' | 'original' = 'ranked') => {
   const doc = new jsPDF();
-  const brandColor = [79, 70, 229];
+  const brandColor: [number, number, number] = [79, 70, 229];
   const nexusLogo = '/nexuslogo.png';
 
   // Header
