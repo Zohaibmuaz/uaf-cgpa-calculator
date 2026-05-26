@@ -792,7 +792,7 @@ const ContactPage = ({ darkMode }: { darkMode: boolean }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
         <div className={`p-8 rounded-[2rem] border transition-all ${darkMode ? 'bg-white/[0.02] border-white/5 hover:border-brand-primary/30' : 'bg-indigo-50/30 border-indigo-100 hover:border-indigo-300'}`}>
           <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-sm ${darkMode ? 'bg-brand-primary/10 text-brand-primary' : 'bg-indigo-100 text-indigo-600'}`}>
-            <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+            <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
           </div>
           <h3 className="text-sm font-black uppercase tracking-widest mb-2">Email Address</h3>
           <a href="mailto:zohaibmuaz@gmail.com" className={`text-xl font-bold tracking-tight transition-colors ${darkMode ? 'text-gray-200 hover:text-brand-primary' : 'text-gray-800 hover:text-indigo-600'}`}>zohaibmuaz@gmail.com</a>
@@ -1051,13 +1051,6 @@ export default function App() {
     setStudent(processStudentData({ ...student, semesters: updatedSemesters }));
   };
 
-  const handlePinList = () => {
-    if (batchResults.length === 0) return;
-    const agNumbers = batchResults.map(s => s.ag_number);
-    localStorage.setItem('pinned_section', JSON.stringify(agNumbers));
-    alert('Section Pinned Successfully! You can retrieve it using "Saved" mode.');
-  };
-
   const fetchPinnedSection = async () => {
     const pinned = localStorage.getItem('pinned_section');
     if (!pinned) {
@@ -1269,7 +1262,7 @@ export default function App() {
               )}
 
               <div className="bg-white dark:bg-white/[0.01] p-3 rounded-[2.5rem] shadow-2xl shadow-gray-300/30 dark:shadow-none border border-gray-100 dark:border-white/[0.05] flex items-center gap-3 pl-8 pr-3 group focus-within:border-indigo-500/30 dark:focus-within:border-brand-primary/20 transition-all backdrop-blur-3xl relative overflow-hidden font-sans">
-                <svg className="w-6 h-6 text-gray-300 dark:text-gray-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <svg className="w-6 h-6 text-gray-300 dark:text-gray-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 
                 {viewMode === 'csv' ? (
                   <div className="flex-1 relative flex items-center gap-4 px-4 overflow-hidden">
@@ -1481,7 +1474,7 @@ export default function App() {
                   title="Exclude specific subjects from CGPA calculation"
                   className={`px-4 md:px-6 py-3 rounded-2xl text-[9px] md:text-[10px] font-black tracking-widest uppercase transition-all flex items-center justify-center gap-2 ${darkMode ? 'bg-white/5 hover:bg-white/10 border border-white/5' : 'bg-gray-100 hover:bg-gray-200 border border-gray-200'} mt-2 md:mt-0 flex-none`}
                  >
-                   <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+                   <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
                    Filters
                  </button>
               </div>
@@ -1542,7 +1535,7 @@ export default function App() {
                 <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl md:rounded-[2rem] flex items-center justify-center shadow-lg border transition-colors ${
                   darkMode ? 'bg-brand-primary/5 text-brand-primary/60 border-brand-primary/10' : 'bg-indigo-50 text-indigo-600 border-indigo-100'
                 }`}>
-                  <svg className="w-8 h-8 md:w-10 md:h-10" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00-.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-2.75.191 1 1 0 00-.246.162l-3 3a1 1 0 001.414 1.414l2.583-2.583c.311.954.83 1.834 1.533 2.566l2.316 2.317a1 1 0 001.414-1.414l-2.317-2.316a7.003 7.003 0 01-1.343-1.63L11 12.12v-4.102l-1.31-.562a1 1 0 00-.787 0l-5.593 2.397z"/><path d="M14.903 12.355l-2.518 1.08a1 1 0 00-.787 1.838l2.518-1.08a1 1 0 00.787-1.838z"/></svg>
+                  <svg className="w-8 h-8 md:w-10 md:h-10" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-2.75.191 1 1 0 00-.246.162l-3 3a1 1 0 001.414 1.414l2.583-2.583c.311.954.83 1.834 1.533 2.566l2.316 2.317a1 1 0 001.414-1.414l-2.317-2.316a7.003 7.003 0 01-1.343-1.63L11 12.12v-4.102l-1.31-.562a1 1 0 00-.787 0l-5.593 2.397z"/><path d="M14.903 12.355l-2.518 1.08a1 1 0 00-.787 1.838l2.518-1.08a1 1 0 00.787-1.838z"/></svg>
                 </div>
                 <div className="text-center md:text-left">
                   <h2 className="text-2xl md:text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tighter uppercase leading-none font-sans">{student.name}</h2>
