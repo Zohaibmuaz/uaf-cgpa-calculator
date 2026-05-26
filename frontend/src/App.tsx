@@ -4,6 +4,11 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import type { StudentData, Semester, Subject } from './utils/engine';
 import { processStudentData, calculateForecast } from './utils/engine';
 
+// --- DEPLOYMENT CONFIGURATION ---
+// Update this URL to your live Render backend URL before deploying to Vercel
+// Example: export const API_BASE_URL = "https://uaf-api.onrender.com";
+export const API_BASE_URL = "https://uaf-cgpa-calculator.onrender.com";
+
 const AcademicForecastModal = ({ student, darkMode, onClose }: { student: StudentData, darkMode: boolean, onClose: () => void }) => {
   const [targetCgpa, setTargetCgpa] = useState(student.cgpa + 0.1 > 4.0 ? 4.0 : Math.round((student.cgpa + 0.1) * 10) / 10);
   const [remainingSemesters, setRemainingSemesters] = useState(1);
@@ -455,7 +460,7 @@ const ExcludeSubjectsPopup = ({
             <h3 className="text-3xl font-black tracking-tighter uppercase leading-none text-gray-800 dark:text-white">Exclude Subjects</h3>
           </div>
           <button onClick={onClose} className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${darkMode ? 'hover:bg-white/5 bg-white/[0.02]' : 'hover:bg-gray-50 bg-gray-50/50'}`}>
-            <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            <svg className="w-6 h-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
 
@@ -627,7 +632,7 @@ const SemesterCard = ({
                         onClick={() => onDeleteSubject(semester.semester_number, idx)}
                         className="p-1.5 md:p-2 hover:bg-red-500/10 text-gray-500 dark:text-gray-400 hover:text-red-500 rounded-lg transition-all"
                       >
-                        <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                       </button>
                     </td>
                   </tr>
@@ -962,7 +967,7 @@ export default function App() {
     try {
       if (viewMode === 'single') {
         const fullAg = `${year}-ag-${regId}`;
-        const response = await fetch(`http://127.0.0.1:8000/student/${fullAg}`);
+        const response = await fetch(`${API_BASE_URL}/student/${fullAg}`);
         if (!response.ok) throw new Error('Student not found or server error');
         const data = await response.json();
         setStudent(data);
@@ -979,7 +984,7 @@ export default function App() {
           const chunk = ids.slice(i, i + chunkSize);
           const tasks = chunk.map(id => {
             const ag = `${year}-ag-${id.toString().padStart(regId.length, '0')}`;
-            return fetch(`http://127.0.0.1:8000/student/${ag}`).then(r => r.json());
+            return fetch(`${API_BASE_URL}/student/${ag}`).then(r => r.json());
           });
           const chunkResults = await Promise.all(tasks);
           results.push(...chunkResults.filter(r => r.ag_number));
@@ -994,7 +999,7 @@ export default function App() {
         const chunkSize = 5;
         for (let i = 0; i < customAgList.length; i += chunkSize) {
           const chunk = customAgList.slice(i, i + chunkSize);
-          const tasks = chunk.map(ag => fetch(`http://127.0.0.1:8000/student/${ag}`).then(r => r.json()));
+          const tasks = chunk.map(ag => fetch(`${API_BASE_URL}/student/${ag}`).then(r => r.json()));
           const chunkResults = await Promise.all(tasks);
           results.push(...chunkResults.filter(r => r.ag_number));
           setProgress(((i + chunk.length) / total) * 100);
@@ -1069,7 +1074,7 @@ export default function App() {
     const chunkSize = 5;
     for (let i = 0; i < agNumbers.length; i += chunkSize) {
       const chunk = agNumbers.slice(i, i + chunkSize);
-      const tasks = chunk.map(ag => fetch(`http://127.0.0.1:8000/student/${ag}`).then(r => r.json()));
+      const tasks = chunk.map(ag => fetch(`${API_BASE_URL}/student/${ag}`).then(r => r.json()));
       const chunkResults = await Promise.all(tasks);
       results.push(...chunkResults.filter(r => r.ag_number));
       setProgress(((i + chunk.length) / agNumbers.length) * 100);
@@ -1264,7 +1269,7 @@ export default function App() {
               )}
 
               <div className="bg-white dark:bg-white/[0.01] p-3 rounded-[2.5rem] shadow-2xl shadow-gray-300/30 dark:shadow-none border border-gray-100 dark:border-white/[0.05] flex items-center gap-3 pl-8 pr-3 group focus-within:border-indigo-500/30 dark:focus-within:border-brand-primary/20 transition-all backdrop-blur-3xl relative overflow-hidden font-sans">
-                <svg className="w-6 h-6 text-gray-300 dark:text-gray-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <svg className="w-6 h-6 text-gray-300 dark:text-gray-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 
                 {viewMode === 'csv' ? (
                   <div className="flex-1 relative flex items-center gap-4 px-4 overflow-hidden">
@@ -1537,7 +1542,7 @@ export default function App() {
                 <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl md:rounded-[2rem] flex items-center justify-center shadow-lg border transition-colors ${
                   darkMode ? 'bg-brand-primary/5 text-brand-primary/60 border-brand-primary/10' : 'bg-indigo-50 text-indigo-600 border-indigo-100'
                 }`}>
-                  <svg className="w-8 h-8 md:w-10 md:h-10" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-2.75.191 1 1 0 00-.246.162l-3 3a1 1 0 001.414 1.414l2.583-2.583c.311.954.83 1.834 1.533 2.566l2.316 2.317a1 1 0 001.414-1.414l-2.317-2.316a7.003 7.003 0 01-1.343-1.63L11 12.12v-4.102l-1.31-.562a1 1 0 00-.787 0l-5.593 2.397z"/><path d="M14.903 12.355l-2.518 1.08a1 1 0 00-.787 1.838l2.518-1.08a1 1 0 00.787-1.838z"/></svg>
+                  <svg className="w-8 h-8 md:w-10 md:h-10" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00-.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-2.75.191 1 1 0 00-.246.162l-3 3a1 1 0 001.414 1.414l2.583-2.583c.311.954.83 1.834 1.533 2.566l2.316 2.317a1 1 0 001.414-1.414l-2.317-2.316a7.003 7.003 0 01-1.343-1.63L11 12.12v-4.102l-1.31-.562a1 1 0 00-.787 0l-5.593 2.397z"/><path d="M14.903 12.355l-2.518 1.08a1 1 0 00-.787 1.838l2.518-1.08a1 1 0 00.787-1.838z"/></svg>
                 </div>
                 <div className="text-center md:text-left">
                   <h2 className="text-2xl md:text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tighter uppercase leading-none font-sans">{student.name}</h2>
