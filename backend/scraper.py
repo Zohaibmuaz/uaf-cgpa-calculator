@@ -35,7 +35,8 @@ class UAFScraper:
                 async with session.get(login_url, timeout=15) as login_resp:
                     if login_resp.status != 200:
                         logger.error("Failed to load login page to extract token.")
-                        return self.get_mock_data(ag_number)
+                        if self.use_mock: return self.get_mock_data(ag_number)
+                        raise ValueError("LMS is unreachable")
                     
                     login_html = await login_resp.text()
                     
@@ -103,8 +104,9 @@ class UAFScraper:
                 break
         
         if not res_table:
-            logger.warning(f"Could not find result table for {ag_number}. Falling back to mock.")
-            return self.get_mock_data(ag_number)
+            logger.warning(f"Could not find result table for {ag_number}.")
+            if self.use_mock: return self.get_mock_data(ag_number)
+            raise ValueError("LMS is unreachable")
 
         all_rows = res_table.find_all('tr')
         header_cols = [th.get_text().strip().lower() for th in all_rows[0].find_all(['td', 'th'])]
