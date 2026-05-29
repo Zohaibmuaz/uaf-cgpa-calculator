@@ -819,7 +819,6 @@ export default function App() {
   const regIdRef = useRef<HTMLInputElement>(null);
   const [year, setYear] = useState('');
   const [regId, setRegId] = useState('');
-  const [endRegId, setEndRegId] = useState('');
   const [student, setStudent] = useState<StudentData | null>(null);
   const [batchResults, setBatchResults] = useState<StudentData[]>([]);
   const [loading, setLoading] = useState(false);
