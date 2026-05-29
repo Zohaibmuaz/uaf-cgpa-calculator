@@ -974,27 +974,6 @@ export default function App() {
         if (!response.ok) throw new Error('Student not found or server error');
         const data = await response.json();
         setStudent(data);
-      } else if (viewMode === 'batch') {
-        if (!endRegId) throw new Error('Please enter the end Registration ID');
-        const start = parseInt(regId);
-        const end = parseInt(endRegId);
-        if (isNaN(start) || end < start) throw new Error('Invalid range');
-        const total = (end - start) + 1;
-        const results: StudentData[] = [];
-        const ids = Array.from({length: total}, (_, i) => start + i);
-        const chunkSize = 5;
-        for (let i = 0; i < ids.length; i += chunkSize) {
-          const chunk = ids.slice(i, i + chunkSize);
-          const tasks = chunk.map(id => {
-            const ag = `${year}-ag-${id.toString().padStart(regId.length, '0')}`;
-            return fetch(`${API_BASE_URL}/student/${ag}`).then(r => r.json());
-          });
-          const chunkResults = await Promise.all(tasks);
-          results.push(...chunkResults.filter(r => r.ag_number));
-          setProgress(((i + chunk.length) / total) * 100);
-          setBatchResults([...results]);
-        }
-        if (results.length === 0) throw new Error('No students found in this range');
       } else if (viewMode === 'csv') {
         if (customAgList.length === 0) throw new Error('Please upload a valid CSV file with AG numbers');
         const total = customAgList.length;
