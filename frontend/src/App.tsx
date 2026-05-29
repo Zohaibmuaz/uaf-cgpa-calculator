@@ -632,7 +632,7 @@ const SemesterCard = ({
                         onClick={() => onDeleteSubject(semester.semester_number, idx)}
                         className="p-1.5 md:p-2 hover:bg-red-500/10 text-gray-500 dark:text-gray-400 hover:text-red-500 rounded-lg transition-all"
                       >
-                        <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                       </button>
                     </td>
                   </tr>
@@ -901,7 +901,7 @@ export default function App() {
   }, [batchResults]);
 
   // Recalculate CGPA using course_code for exclusion
-  const rankedStudents = useMemo(() => {
+  const studentsWithRanks = useMemo(() => {
     const recalculated = batchResults.map((s, index) => {
       const bestAttempts = new Map<string, { qp: number, ch: number }>();
       
@@ -939,12 +939,14 @@ export default function App() {
 
     // 1. Sort by CGPA to assign globalRank
     const sortedByRank = [...recalculated].sort((a, b) => b.cgpa - a.cgpa);
-    const withRanks = sortedByRank.map((s, i) => ({ ...s, globalRank: i + 1 }));
+    return sortedByRank.map((s, i) => ({ ...s, globalRank: i + 1 }));
+  }, [batchResults, excludedSubjects]);
 
+  const rankedStudents = useMemo(() => {
     // 2. Apply view sort based on sortMode
     const finalSorted = sortMode === 'original'
-      ? [...withRanks].sort((a, b) => (a as any).originalIndex - (b as any).originalIndex)
-      : withRanks;
+      ? [...studentsWithRanks].sort((a, b) => (a as any).originalIndex - (b as any).originalIndex)
+      : studentsWithRanks;
 
     if (!leaderboardSearch) return finalSorted;
     
@@ -953,7 +955,9 @@ export default function App() {
       s.name.toLowerCase().includes(query) || 
       s.ag_number.toLowerCase().includes(query)
     );
-  }, [batchResults, leaderboardSearch, excludedSubjects, sortMode]);
+  }, [studentsWithRanks, leaderboardSearch, sortMode]);
+
+  const podiumStudents = useMemo(() => studentsWithRanks.slice(0, 3), [studentsWithRanks]);
 
   const fetchResults = async () => {
     setLoading(true);
@@ -1261,11 +1265,11 @@ export default function App() {
                 </div>
               )}
 
-              <div className="bg-white dark:bg-white/[0.01] p-3 rounded-[2.5rem] shadow-2xl shadow-gray-300/30 dark:shadow-none border border-gray-100 dark:border-white/[0.05] flex items-center gap-3 pl-8 pr-3 group focus-within:border-indigo-500/30 dark:focus-within:border-brand-primary/20 transition-all backdrop-blur-3xl relative overflow-hidden font-sans">
-                <svg className="w-6 h-6 text-gray-300 dark:text-gray-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              <div className="bg-white dark:bg-white/[0.01] p-1.5 md:p-3 rounded-[2.5rem] shadow-2xl shadow-gray-300/30 dark:shadow-none border border-gray-100 dark:border-white/[0.05] flex items-center gap-1 md:gap-3 pl-3 md:pl-8 pr-1.5 md:pr-3 group focus-within:border-indigo-500/30 dark:focus-within:border-brand-primary/20 transition-all backdrop-blur-3xl relative overflow-hidden font-sans">
+                <svg className="w-5 h-5 md:w-6 h-6 text-gray-300 dark:text-gray-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 
                 {viewMode === 'csv' ? (
-                  <div className="flex-1 relative flex items-center gap-4 px-4 overflow-hidden">
+                  <div className="flex-1 relative flex items-center gap-2 md:gap-4 px-2 md:px-4 overflow-hidden">
                     <input 
                       type="file" 
                       accept=".csv,.txt,.xlsx,.xls"
@@ -1301,25 +1305,22 @@ export default function App() {
                         reader.readAsArrayBuffer(file);
                       }}
                     />
-                    <div className="bg-gray-100 dark:bg-white/[0.03] px-4 md:px-5 py-2.5 rounded-xl text-gray-500 dark:text-gray-400 text-[9px] md:text-[10px] font-black uppercase tracking-wider flex items-center gap-2 md:gap-3 shrink-0 group/btn max-w-[140px] md:max-w-none">
-                      <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                      <span className="truncate">{uploadedFilename ? uploadedFilename : 'UPLOAD CSV/XLSX'}</span>
-                      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-gray-800 text-white text-[9px] font-black uppercase rounded-lg opacity-0 group-hover/btn:opacity-100 pointer-events-none transition-opacity whitespace-nowrap shadow-xl z-20">
-                        Upload your class formation in CSV or XLSX
-                      </div>
+                    <div className="bg-gray-100 dark:bg-white/[0.03] px-3 md:px-5 py-2 md:py-2.5 rounded-xl text-gray-500 dark:text-gray-400 text-[8px] md:text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 md:gap-3 shrink-0 group/btn max-w-[100px] md:max-w-none">
+                      <svg className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                      <span className="truncate">{uploadedFilename ? uploadedFilename : 'UPLOAD'}</span>
                     </div>
                     {customAgList.length > 0 ? (
-                      <span className="text-[11px] font-black text-brand-primary uppercase tracking-widest animate-in fade-in truncate">
-                        {customAgList.length} AG NUMBERS EXTRACTED
+                      <span className="text-[10px] md:text-[11px] font-black text-brand-primary uppercase tracking-widest animate-in fade-in truncate">
+                        {customAgList.length} AGs
                       </span>
                     ) : (
-                      <span className="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-widest animate-in fade-in italic">
-                        No configuration needed — system auto-scans for AGs
+                      <span className="text-[8px] md:text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-widest animate-in fade-in italic truncate">
+                        AUTO-SCAN
                       </span>
                     )}
                   </div>
                 ) : (
-                  <>
+                  <div className="flex-1 flex items-center gap-0.5 md:gap-3 min-w-0">
                     <input 
                       type="text" 
                       value={year} 
@@ -1330,47 +1331,33 @@ export default function App() {
                           regIdRef.current?.focus();
                         }
                       }}
-                      className="w-16 text-center font-black text-xl bg-transparent text-gray-800 dark:text-white focus:outline-none placeholder:text-gray-400 dark:placeholder:text-gray-600 shrink-0"
+                      className="w-12 md:w-16 text-center font-black text-lg md:text-xl bg-transparent text-gray-800 dark:text-white focus:outline-none placeholder:text-gray-400 dark:placeholder:text-gray-600 shrink-0"
                       placeholder="2023"
                     />
-                    <div className="bg-gray-100 dark:bg-white/[0.03] px-3 py-1.5 rounded-xl text-gray-400 dark:text-gray-700 text-[9px] font-black uppercase tracking-[0.2em] shrink-0">-ag-</div>
+                    <div className="bg-gray-100 dark:bg-white/[0.03] px-1.5 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl text-gray-400 dark:text-gray-700 text-[8px] md:text-[9px] font-black uppercase tracking-[0.1em] md:tracking-[0.2em] shrink-0">-ag-</div>
                     <input 
                       type="text" 
                       value={regId} 
                       ref={regIdRef}
                       onChange={(e) => setRegId(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && fetchResults()}
-                      className="w-20 text-center font-black text-xl bg-transparent text-gray-800 dark:text-white focus:outline-none placeholder:text-gray-400 dark:placeholder:text-gray-600 border-b border-transparent focus:border-brand-primary/30 font-sans shrink-0"
+                      className="w-16 md:w-20 text-center font-black text-lg md:text-xl bg-transparent text-gray-800 dark:text-white focus:outline-none placeholder:text-gray-400 dark:placeholder:text-gray-600 border-b border-transparent focus:border-brand-primary/30 font-sans shrink-0"
                       placeholder="10160"
                     />
-                    {viewMode === 'batch' && (
-                      <>
-                        <div className="text-gray-300 font-bold px-2 font-sans text-xs uppercase tracking-widest opacity-40 shrink-0">to</div>
-                        <input 
-                          type="text" 
-                          value={endRegId} 
-                          onChange={(e) => setEndRegId(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && fetchResults()}
-                          className="w-20 text-center font-black text-xl bg-transparent text-gray-800 dark:text-white focus:outline-none placeholder:text-gray-400 dark:placeholder:text-gray-600 border-b border-transparent focus:border-brand-primary/30 shrink-0"
-                          placeholder="10160"
-                        />
-                      </>
-                    )}
-                  </>
+                  </div>
                 )}
-                <div className="flex-1 min-w-0 font-sans"></div>
                 <button 
                   onClick={fetchResults}
                   disabled={loading}
-                  className={`px-6 md:px-10 py-4 rounded-[1.5rem] md:rounded-[1.8rem] font-black tracking-widest shadow-xl transition-all flex items-center justify-center gap-3 text-sm whitespace-nowrap ${
+                  className={`w-11 h-11 md:w-auto md:h-auto md:px-10 md:py-4 rounded-xl md:rounded-[1.8rem] font-black tracking-widest shadow-xl transition-all flex items-center justify-center gap-3 text-sm whitespace-nowrap shrink-0 ${
                     darkMode ? 'bg-brand-primary/90 text-black shadow-brand-primary/10 hover:brightness-105' : 'bg-indigo-600 text-white shadow-indigo-200 hover:bg-indigo-700'
                   } active:scale-95`}
                 >
                   <span className="hidden md:inline">{loading ? (viewMode === 'batch' ? `${Math.round(progress)}%` : '...') : 'ANALYZE'}</span>
                   {loading ? (
-                    <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <svg className="w-5 h-5 md:w-5 md:h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                   ) : (
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <svg className="w-5 h-5 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                   )}
                 </button>
               </div>
@@ -1400,36 +1387,36 @@ export default function App() {
             {/* Podium Component */}
             <div className="grid grid-cols-3 gap-2 md:gap-8 mb-16 max-w-5xl mx-auto items-end pt-10 font-sans text-gray-800 dark:text-white">
               {/* Rank 2 */}
-              {rankedStudents[1] && (
+              {podiumStudents[1] && (
                 <div className="flex flex-col items-center group">
                   <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gray-100 dark:bg-white/5 border-2 border-gray-200 dark:border-white/10 flex items-center justify-center text-xl md:text-2xl font-black mb-4 group-hover:scale-110 transition-transform">🥈</div>
-                  <div className="text-xl md:text-3xl font-black text-gray-400 italic mb-4 font-sans">{rankedStudents[1].cgpa.toFixed(2)}</div>
+                  <div className="text-xl md:text-3xl font-black text-gray-400 italic mb-4 font-sans">{podiumStudents[1].cgpa.toFixed(2)}</div>
                   <div className="h-20 md:h-32 w-full bg-gradient-to-t from-gray-100 dark:from-white/5 to-transparent rounded-t-2xl md:rounded-t-3xl border-x-2 border-t-2 border-gray-200 dark:border-white/10 p-2 md:p-6 text-center">
-                    <div className="text-[7px] md:text-[10px] font-black uppercase tracking-tight md:tracking-widest leading-none whitespace-normal break-words">{rankedStudents[1].name}</div>
-                    <div className="text-[6px] md:text-[9px] font-bold text-gray-400 opacity-60 uppercase mt-1 leading-none">{rankedStudents[1].ag_number}</div>
+                    <div className="text-[7px] md:text-[10px] font-black uppercase tracking-tight md:tracking-widest leading-none whitespace-normal break-words">{podiumStudents[1].name}</div>
+                    <div className="text-[6px] md:text-[9px] font-bold text-gray-400 opacity-60 uppercase mt-1 leading-none">{podiumStudents[1].ag_number}</div>
                   </div>
                 </div>
               )}
               {/* Rank 1 */}
-              {rankedStudents[0] && (
+              {podiumStudents[0] && (
                 <div className="flex flex-col items-center group">
                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-[1.5rem] md:rounded-[2rem] bg-orange-500/10 dark:bg-brand-primary/10 border-4 border-orange-500 dark:border-brand-primary flex items-center justify-center text-3xl md:text-4xl font-black mb-6 animate-bounce shadow-2xl shadow-brand-primary/20">🥇</div>
-                  <div className="text-3xl md:text-5xl font-black text-orange-500 dark:text-brand-primary italic mb-6 font-sans">{rankedStudents[0].cgpa.toFixed(2)}</div>
+                  <div className="text-3xl md:text-5xl font-black text-orange-500 dark:text-brand-primary italic mb-6 font-sans">{podiumStudents[0].cgpa.toFixed(2)}</div>
                   <div className="h-32 md:h-48 w-full bg-gradient-to-t from-orange-500/10 dark:from-brand-primary/10 to-transparent rounded-t-[2rem] md:rounded-t-[3rem] border-x-4 border-t-4 border-orange-500 dark:border-brand-primary p-3 md:p-8 text-center relative overflow-hidden">
                     {darkMode && <div className="absolute inset-0 bg-brand-primary/5 blur-3xl -z-10"></div>}
-                    <div className="text-[8px] md:text-xs font-black uppercase tracking-tight md:tracking-widest leading-none whitespace-normal break-words">{rankedStudents[0].name}</div>
-                    <div className="text-[7px] md:text-[9px] font-bold text-orange-500 dark:text-brand-primary opacity-60 uppercase mt-1 leading-none">{rankedStudents[0].ag_number}</div>
+                    <div className="text-[8px] md:text-xs font-black uppercase tracking-tight md:tracking-widest leading-none whitespace-normal break-words">{podiumStudents[0].name}</div>
+                    <div className="text-[7px] md:text-[9px] font-bold text-orange-500 dark:text-brand-primary opacity-60 uppercase mt-1 leading-none">{podiumStudents[0].ag_number}</div>
                   </div>
                 </div>
               )}
               {/* Rank 3 */}
-              {rankedStudents[2] && (
+              {podiumStudents[2] && (
                 <div className="flex flex-col items-center group">
                   <div className="w-10 h-10 md:w-14 md:h-14 rounded-2xl bg-orange-900/10 dark:bg-orange-900/20 border-2 border-orange-700/30 flex items-center justify-center text-lg md:text-xl font-black mb-4 group-hover:scale-110 transition-transform">🥉</div>
-                  <div className="text-xl md:text-3xl font-black text-orange-700/60 italic mb-4 font-sans">{rankedStudents[2].cgpa.toFixed(2)}</div>
+                  <div className="text-xl md:text-3xl font-black text-orange-700/60 italic mb-4 font-sans">{podiumStudents[2].cgpa.toFixed(2)}</div>
                   <div className="h-16 md:h-24 w-full bg-gradient-to-t from-orange-900/10 dark:from-orange-900/20 to-transparent rounded-t-xl md:rounded-t-3xl border-x-2 border-t-2 border-orange-700/30 p-2 md:p-5 text-center">
-                    <div className="text-[7px] md:text-[10px] font-black uppercase tracking-tight md:tracking-widest leading-none whitespace-normal break-words">{rankedStudents[2].name}</div>
-                    <div className="text-[6px] md:text-[9px] font-bold text-orange-700 opacity-60 uppercase mt-1 leading-none">{rankedStudents[2].ag_number}</div>
+                    <div className="text-[7px] md:text-[10px] font-black uppercase tracking-tight md:tracking-widest leading-none whitespace-normal break-words">{podiumStudents[2].name}</div>
+                    <div className="text-[6px] md:text-[9px] font-bold text-orange-700 opacity-60 uppercase mt-1 leading-none">{podiumStudents[2].ag_number}</div>
                   </div>
                 </div>
               )}
@@ -1474,7 +1461,7 @@ export default function App() {
                   title="Exclude specific subjects from CGPA calculation"
                   className={`px-4 md:px-6 py-3 rounded-2xl text-[9px] md:text-[10px] font-black tracking-widest uppercase transition-all flex items-center justify-center gap-2 ${darkMode ? 'bg-white/5 hover:bg-white/10 border border-white/5' : 'bg-gray-100 hover:bg-gray-200 border border-gray-200'} mt-2 md:mt-0 flex-none`}
                  >
-                   <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+                   <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
                    Filters
                  </button>
               </div>
@@ -1535,7 +1522,7 @@ export default function App() {
                 <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl md:rounded-[2rem] flex items-center justify-center shadow-lg border transition-colors ${
                   darkMode ? 'bg-brand-primary/5 text-brand-primary/60 border-brand-primary/10' : 'bg-indigo-50 text-indigo-600 border-indigo-100'
                 }`}>
-                  <svg className="w-8 h-8 md:w-10 md:h-10" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00-.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-2.75.191 1 1 0 00-.246.162l-3 3a1 1 0 001.414 1.414l2.583-2.583c.311.954.83 1.834 1.533 2.566l2.316 2.317a1 1 0 001.414-1.414l-2.317-2.316a7.003 7.003 0 01-1.343-1.63L11 12.12v-4.102l-1.31-.562a1 1 0 00-.787 0l-5.593 2.397z"/><path d="M14.903 12.355l-2.518 1.08a1 1 0 00-.787 1.838l2.518-1.08a1 1 0 00.787-1.838z"/></svg>
+                  <svg className="w-8 h-8 md:w-10 md:h-10" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-2.75.191 1 1 0 00-.246.162l-3 3a1 1 0 001.414 1.414l2.583-2.583c.311.954.83 1.834 1.533 2.566l2.316 2.317a1 1 0 001.414-1.414l-2.317-2.316a7.003 7.003 0 01-1.343-1.63L11 12.12v-4.102l-1.31-.562a1 1 0 00-.787 0l-5.593 2.397z"/><path d="M14.903 12.355l-2.518 1.08a1 1 0 00-.787 1.838l2.518-1.08a1 1 0 00.787-1.838z"/></svg>
                 </div>
                 <div className="text-center md:text-left">
                   <h2 className="text-2xl md:text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tighter uppercase leading-none font-sans whitespace-normal break-words max-w-[250px] md:max-w-none">{student.name}</h2>
