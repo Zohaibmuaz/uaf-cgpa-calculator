@@ -971,7 +971,10 @@ export default function App() {
       if (viewMode === 'single') {
         const fullAg = `${year}-ag-${regId}`;
         const response = await fetch(`${API_BASE_URL}/student/${fullAg}`);
-        if (!response.ok) throw new Error('LMS IS NOT REACHABLE');
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || 'LMS IS NOT REACHABLE');
+        }
         const data = await response.json();
         setStudent(data);
       } else if (viewMode === 'csv') {

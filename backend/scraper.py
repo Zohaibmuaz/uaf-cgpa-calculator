@@ -36,7 +36,7 @@ class UAFScraper:
                     if login_resp.status != 200:
                         logger.error("Failed to load login page to extract token.")
                         if self.use_mock: return self.get_mock_data(ag_number)
-                        raise ValueError("LMS is unreachable")
+                        raise ValueError("LMS IS NOT REACHABLE")
                     
                     login_html = await login_resp.text()
                     
@@ -65,18 +65,20 @@ class UAFScraper:
                     if response.status != 200:
                         logger.error(f"LMS returned status {response.status} for {ag_number}")
                         if self.use_mock: return self.get_mock_data(ag_number)
-                        raise ValueError(f"LMS error: {response.status}")
+                        raise ValueError("LMS IS NOT REACHABLE")
                     
                     html = await response.text()
                     if "You are not authorize" in html:
                         logger.warning(f"Unauthorized access for {ag_number}.")
                         if self.use_mock: return self.get_mock_data(ag_number)
-                        raise ValueError("Student record not found or unauthorized")
+                        raise ValueError("AG NUMBER IS NOT CORRECT")
                         
                     return self.parse_html(html, ag_number)
             except Exception as e:
                 logger.error(f"Error fetching data for {ag_number}: {e}")
-                raise e
+                if "LMS IS NOT" in str(e) or "AG NUMBER" in str(e):
+                    raise e
+                raise ValueError("LMS IS NOT REACHABLE")
 
 
     def parse_html(self, html: str, ag_number: str) -> StudentData:
@@ -106,7 +108,7 @@ class UAFScraper:
         if not res_table:
             logger.warning(f"Could not find result table for {ag_number}.")
             if self.use_mock: return self.get_mock_data(ag_number)
-            raise ValueError("LMS is unreachable")
+            raise ValueError("AG NUMBER IS NOT CORRECT")
 
         all_rows = res_table.find_all('tr')
         header_cols = [th.get_text().strip().lower() for th in all_rows[0].find_all(['td', 'th'])]
@@ -188,7 +190,7 @@ class UAFScraper:
 
         if not semesters: 
             if self.use_mock: return self.get_mock_data(ag_number)
-            raise ValueError("No semester data found for this student")
+            raise ValueError("AG NUMBER IS NOT CORRECT")
             
         return StudentData(name=name, ag_number=ag_number, degree="UAF", semesters=semesters, cgpa=0.0)
 
