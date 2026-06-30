@@ -7,7 +7,7 @@ import { processStudentData, calculateForecast } from './utils/engine';
 // --- DEPLOYMENT CONFIGURATION ---
 // Update this URL to your live Render backend URL before deploying to Vercel
 // Example: export const API_BASE_URL = "https://uaf-api.onrender.com";
-export const API_BASE_URL = "https://uaf-cgpa-calculator.onrender.com";
+export const API_BASE_URL = "https://uaf-cgpa-calculator-api.onrender.com";
 
 const AcademicForecastModal = ({ student, darkMode, onClose }: { student: StudentData, darkMode: boolean, onClose: () => void }) => {
   const [targetCgpa, setTargetCgpa] = useState(student.cgpa + 0.1 > 4.0 ? 4.0 : Math.round((student.cgpa + 0.1) * 10) / 10);
